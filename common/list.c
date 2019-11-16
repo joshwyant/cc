@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "../test/stubs.h"
 
 struct List {
     void *data;
@@ -238,6 +239,7 @@ void *list_insert_range(List *list, size_t index, const void *elems, size_t coun
         // Copy the elements to the list
         memcpy(insertion_dest, elems, data_size);
     }
+    list->elem_count += count;
     return insertion_dest;
 } // list_insert_range
 

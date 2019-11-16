@@ -1,0 +1,4 @@
+#ifndef CC_PREPROCESSOR_H__
+#define CC_PREPROCESSOR_H__
+
+#endif // CC_PREPROCESSOR_H__

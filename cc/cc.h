@@ -1,6 +1,6 @@
-#ifndef CC_H__
-#define CC_H__
+#ifndef CC_CC_H__
+#define CC_CC_H__
 
 
 
-#endif // CC_H__
+#endif // CC_CC_H__

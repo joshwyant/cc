@@ -40,9 +40,7 @@ void list_init(List *list, size_t elem_size) {
     list->data = NULL;
     list->data_size = 0;
     list->elem_size = elem_size;
-
     list->elem_count = 0;
-
     list->reserve_count = 0;
     list->version = 0;
 } // list_init
@@ -51,7 +49,7 @@ size_t list_size(const List *list)
 {
     ASSERT(list != NULL);
 
-    return list->elem_size;
+    return list->elem_count;
 } // list_size
 
 bool list_empty(const List *list)
@@ -331,6 +329,7 @@ bool list_copy(List *dest_list, const List *list)
     }
     memcpy(dest_list->data, list->data, list->elem_size * list->elem_count);
     dest_list->elem_count = list->elem_count;
+    return true;
 }
 
 void *list_iter_current_(const Iterator *iter);
@@ -368,6 +367,7 @@ bool list_iter_move_next_(Iterator *iter) {
         return false;
     }
     iter->impl_data1++;
+    return true;
 }
 
 bool list_iter_move_next_reverse_(Iterator *iter) {
@@ -380,6 +380,7 @@ bool list_iter_move_next_reverse_(Iterator *iter) {
         return false;
     }
     iter->impl_data1--;
+    return true;
 }
 
 // Gets an Iterator for this List

@@ -1,0 +1,3 @@
+#!/bin/bash
+cc common/*.c test/*.c test/common/*.c -o bin/test_common
+./bin/test_common

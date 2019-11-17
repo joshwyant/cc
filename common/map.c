@@ -45,14 +45,14 @@ int _map_hash(const Map *map, const void *key) {
 bool map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size,
                   size_t capacity) {
   struct MapBucket bucket;
-  if (map->buckets == NULL ||
-      !(map->buckets = list_alloc(sizeof(struct MapBucket)))) {
+  if (!(map->buckets = list_alloc(sizeof(struct MapBucket)))) {
     return false;
   }
   map->capacity = capacity;
   map->count = 0;
   map->key_info = *key_info;
   map->elem_size = elem_size;
+  map->version = 0;
   if (!list_reserve(map->buckets, capacity)) {
     free(map->buckets);
     map->buckets = NULL;
@@ -309,10 +309,12 @@ void map_delete(Map *map, const void *key) {
 void map_clear(Map *map) {
   ASSERT(map != NULL);
 
+  struct MapBucket *bucket;
   List *kvps;
   KeyValuePair *kvp;
   for (size_t i = 0; i < map->capacity; i++) {
-    kvps = list_get(map->buckets, i);
+    bucket = list_get(map->buckets, i);
+    kvps = bucket->key_value_pairs;
     size_t nkvps = list_size(kvps);
     for (size_t j = 0; j < nkvps; j++) {
       kvp = list_get(kvps, j);
@@ -605,7 +607,7 @@ bool map_iter_eof_(const Iterator *iter) {
   ASSERT(map != NULL);
   ASSERT(iter->version == map->version &&
          "Collection changed while iterating.");
-  return map_empty(map) || iter->impl_data1 >= map->capacity;
+  return map_empty(map) || iter->impl_data1 >= (int)map->capacity;
 }
 
 bool map_iter_move_next_(Iterator *iter) {
@@ -619,9 +621,14 @@ bool map_iter_move_next_(Iterator *iter) {
     return false;
   }
   iter->impl_data2++;
-  if (iter->impl_data2 > list_size(list_get(map->buckets, iter->impl_data1))) {
+  while (iter->impl_data1 == -1 ||
+         iter->impl_data2 >= list_size(((struct MapBucket *)list_get(
+                                            map->buckets, iter->impl_data1))
+                                           ->key_value_pairs)) {
     iter->impl_data1++;
     iter->impl_data2 = 0;
+    if (map_iter_eof_(iter))
+      break;
   }
   return !map_iter_eof_(iter);
 }

@@ -43,13 +43,13 @@ int _set_hash(const Set *set, const void *key) {
 // Initializes a pre-allocated Set object with a custom capacity
 bool set_init_ext(Set *set, KeyInfo *key_info, size_t capacity) {
   struct SetBucket bucket;
-  if (set->buckets == NULL ||
-      !(set->buckets = list_alloc(sizeof(struct SetBucket)))) {
+  if (!(set->buckets = list_alloc(sizeof(struct SetBucket)))) {
     return false;
   }
   set->capacity = capacity;
   set->count = 0;
   set->key_info = *key_info;
+  set->version = 0;
   if (!list_reserve(set->buckets, capacity)) {
     free(set->buckets);
     set->buckets = NULL;
@@ -285,10 +285,12 @@ void set_delete(Set *set, const void *key) {
 void set_clear(Set *set) {
   ASSERT(set != NULL);
 
+  struct SetBucket *bucket;
   List *items;
   void **ptrval;
   for (size_t i = 0; i < set->capacity; i++) {
-    items = list_get(set->buckets, i);
+    bucket = list_get(set->buckets, i);
+    items = bucket->items;
     size_t nitems = list_size(items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = list_get(items, j);
@@ -537,7 +539,7 @@ bool set_iter_eof_(const Iterator *iter) {
   ASSERT(set != NULL);
   ASSERT(iter->version == set->version &&
          "Collection changed while iterating.");
-  return set_empty(set) || iter->impl_data1 >= set->capacity;
+  return set_empty(set) || iter->impl_data1 >= (int)set->capacity;
 }
 
 bool set_iter_move_next_(Iterator *iter) {
@@ -551,9 +553,14 @@ bool set_iter_move_next_(Iterator *iter) {
     return false;
   }
   iter->impl_data2++;
-  if (iter->impl_data2 > list_size(list_get(set->buckets, iter->impl_data1))) {
+  while (iter->impl_data1 == -1 ||
+         iter->impl_data2 >= list_size(((struct SetBucket *)list_get(
+                                            set->buckets, iter->impl_data1))
+                                           ->items)) {
     iter->impl_data1++;
     iter->impl_data2 = 0;
+    if (set_iter_eof_(iter))
+      break;
   }
   return !set_iter_eof_(iter);
 }

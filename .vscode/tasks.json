@@ -1,0 +1,24 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "clang build common_tests",
+            "command": "/usr/bin/cc",
+            "args": [
+                "-D",
+                "TESTING",
+                "-g",
+                "${workspaceFolder}/common/**/*.c",
+                "-g",
+                "${workspaceFolder}/test/**/*.c",
+                "-o",
+                "${workspaceFolder}/bin/test_common",
+                "-Wno-extern-initializer"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            }
+        }
+    ],
+    "version": "2.0.0"
+}

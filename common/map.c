@@ -47,7 +47,7 @@ int _map_hash(const Map *map, const void *key)
 bool map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size, size_t capacity)
 {
     struct MapBucket bucket;
-    if (map->buckets == NULL && !(map->buckets = list_alloc(sizeof(struct MapBucket)))) {
+    if (map->buckets == NULL || !(map->buckets = list_alloc(sizeof(struct MapBucket)))) {
         return false;
     }
     map->capacity = capacity;
@@ -207,7 +207,6 @@ const KeyValuePair map_add(Map *map, const void *key, const void *data)
     const KeyValuePair *pkvp;
     int hash = _map_hash(map, key);
     if ((pkvp = _map_find_ext(map, key, hash)) == NULL) {
-        kvp = *pkvp;
         size_t ibucket = hash % list_size(map->buckets);
         struct MapBucket *bucket = list_get(map->buckets, ibucket);
         if (!(kvp.key = malloc(map->key_info.key_size))) {

@@ -2,6 +2,7 @@
 #define TEST_COMMON_COMMON_TESTS_H__
 
 #include "list_tests.h"
+#include "map_tests.h"
 
 int common_tests();
 

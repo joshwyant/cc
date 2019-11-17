@@ -46,7 +46,7 @@ int _set_hash(const Set *set, const void *key)
 bool set_init_ext(Set *set, KeyInfo *key_info, size_t capacity)
 {
     struct SetBucket bucket;
-    if (set->buckets == NULL && !(set->buckets = list_alloc(sizeof(struct SetBucket)))) {
+    if (set->buckets == NULL || !(set->buckets = list_alloc(sizeof(struct SetBucket)))) {
         return false;
     }
     set->capacity = capacity;

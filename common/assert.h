@@ -6,9 +6,11 @@
 #include <stdio.h>
 
 #ifndef NDEBUG
-    #define ASSERT(condition) assert(condition)
+#define ASSERT(condition) assert(condition)
 #else
-    #define ASSERT(condition) do { } while (false)
+#define ASSERT(condition)                                                      \
+  do {                                                                         \
+  } while (false)
 #endif // NDEBUG
 
 #endif // COMMON_ASSERT_H__

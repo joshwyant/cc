@@ -10,16 +10,18 @@
 typedef struct PriorityQueue PriorityQueue;
 
 typedef enum {
-    PQ_MODE_INVALID,
-    PQ_MODE_SMALLEST_FIRST,
-    PQ_MODE_LARGEST_FIRST,
+  PQ_MODE_INVALID,
+  PQ_MODE_SMALLEST_FIRST,
+  PQ_MODE_LARGEST_FIRST,
 } PriorityQueueMode;
 
 // Creates a new PriorityQueue object.
-PriorityQueue *priority_queue_alloc(RelationalKeyInfo *key_info, size_t elem_size, PriorityQueueMode mode);
+PriorityQueue *priority_queue_alloc(RelationalKeyInfo *key_info,
+                                    size_t elem_size, PriorityQueueMode mode);
 
 // Initializes a pre-allocated PriorityQueue object
-bool priority_queue_init(PriorityQueue *queue, RelationalKeyInfo *key_info, size_t elem_size, PriorityQueueMode mode);
+bool priority_queue_init(PriorityQueue *queue, RelationalKeyInfo *key_info,
+                         size_t elem_size, PriorityQueueMode mode);
 
 // Gets the number of elements in the PriorityQueue
 size_t priority_queue_size(const PriorityQueue *queue);
@@ -56,13 +58,17 @@ RelationalKeyInfo *priority_queue_key_info(const PriorityQueue *queue);
 
 // Adds the item to the queue and returns pointer to new data.
 // Returns NULL if unsuccessful.
-void *priority_queue_enqueue(PriorityQueue *queue, const void *key, const void *data);
+void *priority_queue_enqueue(PriorityQueue *queue, const void *key,
+                             const void *data);
 
 // Removes an item from the queue and stores it in the given location.
-void priority_queue_dequeue(PriorityQueue *queue, const void *key_out, const void *data_out);
+void priority_queue_dequeue(PriorityQueue *queue, const void *key_out,
+                            const void *data_out);
 
-// Peeks the highest priority item in the queue and stores it in the given location.
-void priority_queue_peek(PriorityQueue *queue, const void *key_out, const void *data_out);
+// Peeks the highest priority item in the queue and stores it in the given
+// location.
+void priority_queue_peek(PriorityQueue *queue, const void *key_out,
+                         const void *data_out);
 
 // Removes all the items from the queue.
 // Remember to clean up memory first.

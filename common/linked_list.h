@@ -65,11 +65,15 @@ void linked_list_set(const LinkedListNode *node, const void *data);
 // Gets the data item in the linked list node.
 void *linked_list_get(const LinkedListNode *node);
 
-// Inserts the given element before the given node. Returns NULL if unsuccessful.
-LinkedListNode *linked_list_insert_before(LinkedList *list, LinkedListNode *node, const void *elem);
+// Inserts the given element before the given node. Returns NULL if
+// unsuccessful.
+LinkedListNode *linked_list_insert_before(LinkedList *list,
+                                          LinkedListNode *node,
+                                          const void *elem);
 
 // Inserts the given element after the given node. Returns NULL if unsuccessful.
-LinkedListNode *linked_list_insert_after(LinkedList *list, LinkedListNode *node, const void *elem);
+LinkedListNode *linked_list_insert_after(LinkedList *list, LinkedListNode *node,
+                                         const void *elem);
 
 // Appends the given element to the list.
 // Returns a pointer to the appended node. Returns NULL if unsuccessful.
@@ -93,7 +97,8 @@ void linked_list_remove_last(LinkedList *list);
 void linked_list_clear(LinkedList *list);
 
 // Removes a range of elements from the list starting with the given node.
-void linked_list_remove_range(LinkedList *list, LinkedListNode *node, int count);
+void linked_list_remove_range(LinkedList *list, LinkedListNode *node,
+                              int count);
 
 // Copies a list. Returns whether successful.
 bool linked_list_copy(LinkedList *dest_list, const LinkedList *list);

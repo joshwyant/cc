@@ -33,8 +33,8 @@ size_t map_element_size(const Map *map);
 // Gets the key info for the Map
 const KeyInfo *map_key_info(const Map *map);
 
-// Copies the key and value to the map and returns pointer to new key/value pair.
-// Returns NULL in the key if unsuccessful.
+// Copies the key and value to the map and returns pointer to new key/value
+// pair. Returns NULL in the key if unsuccessful.
 const KeyValuePair map_add(Map *map, const void *key, const void *data);
 
 // Looks up the key in map and returns the key/value pair if found.

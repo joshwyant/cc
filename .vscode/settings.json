@@ -2,5 +2,7 @@
     "files.associations": {
         "list": "c",
         "map.h": "c"
-    }
+    },
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true
 }

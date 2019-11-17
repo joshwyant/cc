@@ -38,7 +38,8 @@ void array_set(const Array *array, size_t index, const void *elem);
 
 // Sets the data at `index' to the given data.
 // `index' and data must be within the bounds of the array.
-void array_set_range(const Array *array, size_t index, const void *elem, int count);
+void array_set_range(const Array *array, size_t index, const void *elem,
+                     int count);
 
 // Copies a array. Returns whether successful.
 bool array_copy(Array *dest_array, const Array *array);

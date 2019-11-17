@@ -62,7 +62,8 @@ void *list_insert(List *list, size_t index, const void *elem);
 
 // Inserts the given elements somewhere in the middle of the list.
 // Returns a pointer to the inserted data. Returns NULL if unsuccessful.
-void *list_insert_range(List *list, size_t index, const void *elems, size_t count);
+void *list_insert_range(List *list, size_t index, const void *elems,
+                        size_t count);
 
 // Appends the given element to the list.
 // Returns a pointer to the appended data. Returns NULL if unsuccessful.

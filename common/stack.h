@@ -52,7 +52,8 @@ void *stack_get(const Stack *stack, size_t index);
 // Returns NULL if unsuccessful.
 void *stack_push(Stack *stack, const void *data);
 
-// Removes an item from the end of the stack and stores it in the given location.
+// Removes an item from the end of the stack and stores it in the given
+// location.
 void stack_pop(Stack *stack, const void *data_out);
 
 // Peeks the item on the end of the stack and stores it in the given location.

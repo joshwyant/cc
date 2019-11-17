@@ -8,7 +8,7 @@
 
 typedef struct Array Array;
 
-void array_init(Array *array, size_t count, void *data, size_t elem_size);
+bool array_init(Array *array, size_t count, void *data, size_t elem_size);
 
 Array *array_alloc(size_t count, size_t elem_size);
 

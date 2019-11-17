@@ -13,7 +13,7 @@ typedef struct Map Map;
 Map *map_alloc(KeyInfo *key_info, size_t elem_size);
 
 // Initializes a pre-allocated Map object
-void map_init(Map *map, KeyInfo *key_info, size_t elem_size);
+bool map_init(Map *map, KeyInfo *key_info, size_t elem_size);
 
 // Gets the number of elements in the Map
 size_t map_size(const Map *map);
@@ -31,18 +31,21 @@ void map_cleanup(Map *map);
 size_t map_element_size(const Map *map);
 
 // Gets the key info for the Map
-KeyInfo *map_key_info(const Map *map);
+const KeyInfo *map_key_info(const Map *map);
 
 // Copies the key and value to the map and returns pointer to new key/value pair.
-// Returns NULL if unsuccessful.
-KeyValuePair *map_add(Map *map, const void *key, const void *data);
+// Returns NULL in the key if unsuccessful.
+const KeyValuePair map_add(Map *map, const void *key, const void *data);
+
+// Looks up the key in map and returns the key/value pair if found.
+const KeyValuePair map_find(const Map *map, const void *key);
 
 // Looks up the key in map and stores the data in the given location.
 // Returns whether successful.
-bool map_get(Map *map, const void *key, const void *data_out);
+bool map_get(const Map *map, const void *key, void *data_out);
 
 // Checks whether the given key exists in the map.
-bool map_exists(Map *map, const void *key);
+bool map_exists(const Map *map, const void *key);
 
 // Removes an item from the map.
 void map_delete(Map *map, const void *key);
@@ -55,28 +58,28 @@ void map_clear(Map *map);
 bool map_copy(Map *dest_map, const Map *map);
 
 // Creates the union of two maps.
-void map_union(Map *dest_map, const Map *a, const Map *b);
+bool map_union(Map *dest_map, const Map *a, const Map *b);
 
 // Creates the intersection of two maps.
-void map_intersection(Map *dest_map, const Map *a, const Map *b);
+bool map_intersection(Map *dest_map, const Map *a, const Map *b);
 
 // Creates the difference of two maps.
-void map_difference(Map *dest_map, const Map *a, const Map *b);
+bool map_difference(Map *dest_map, const Map *a, const Map *b);
 
 // Creates the symmetric difference of two maps.
-void map_symmetric_difference(Map *dest_map, const Map *a, const Map *b);
+bool map_symmetric_difference(Map *dest_map, const Map *a, const Map *b);
 
 // Stores the union of two maps into the first map.
-void map_union_with(Map *dest_map, const Map *map);
+bool map_union_with(Map *dest_map, const Map *map);
 
 // Stores the intersection of two maps into the first map.
-void map_intersect_with(Map *dest_map, const Map *map);
+bool map_intersect_with(Map *dest_map, const Map *map);
 
 // Stores the difference of two maps into the first map.
-void map_difference_with(Map *dest_map, const Map *map);
+bool map_difference_with(Map *dest_map, const Map *map);
 
 // Stores the symmetric difference of two maps into the first map.
-void map_symmetric_difference_with(Map *dest_map, const Map *map);
+bool map_symmetric_difference_with(Map *dest_map, const Map *map);
 
 // Gets a key/value Iterator for this Map in an undefined order.
 void map_get_iterator(const Map *map, Iterator *iter);

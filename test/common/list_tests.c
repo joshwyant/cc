@@ -35,8 +35,7 @@ TEST(list_basics)
     assert(list_size(list) == 5);
     assert(list_capacity(list) == 8);
 
-    list_remove(list, 0);
-    printf("%d\n", (int)list_size(list));
+    list_remove_range(list, 3, 2);
     assert(list_size(list) == 3);
 
     list_free(list);

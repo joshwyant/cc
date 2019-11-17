@@ -13,7 +13,7 @@ typedef struct Stack Stack;
 Stack *stack_alloc(size_t elem_size);
 
 // Initializes a pre-allocated Stack object
-void stack_init(Stack *stack, size_t elem_size);
+bool stack_init(Stack *stack, size_t elem_size);
 
 // Gets the number of elements in the Stack
 size_t stack_size(const Stack *stack);

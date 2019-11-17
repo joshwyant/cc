@@ -13,7 +13,7 @@ typedef struct List List;
 List *list_alloc(size_t elem_size);
 
 // Initializes a pre-allocated List object
-void list_init(List *list, size_t elem_size);
+bool list_init(List *list, size_t elem_size);
 
 // Gets the number of elements in the List
 size_t list_size(const List *list);

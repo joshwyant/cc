@@ -60,7 +60,7 @@ struct Indexer {
 struct KeyInfo {
     size_t key_size;
     int (*hash_fn)(const void *key);
-    bool (*eq_fn)(const void *key);
+    bool (*eq_fn)(const void *key_a, const void *key_b);
 };
 
 struct RelationalKeyInfo {
@@ -71,7 +71,6 @@ struct RelationalKeyInfo {
 struct KeyValuePair {
     void *key;
     void *value;
-    char data[1]; // Extends beyond 1 byte, and space is allocated dynamically.
 };
 
 void for_each(Iterator *iter, void (*action)(void *elem));

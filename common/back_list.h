@@ -24,7 +24,7 @@ typedef struct BackListNode BackListNode;
 BackList *back_list_alloc(size_t elem_size);
 
 // Initializes a pre-allocated BackList object
-void back_list_init(BackList *list, size_t elem_size);
+bool back_list_init(BackList *list, size_t elem_size);
 
 // Gets the number of elements in the BackList
 size_t back_list_size(const BackList *list);

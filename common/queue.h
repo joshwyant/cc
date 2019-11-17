@@ -13,7 +13,7 @@ typedef struct Queue Queue;
 Queue *queue_alloc(size_t elem_size);
 
 // Initializes a pre-allocated Queue object
-void queue_init(Queue *queue, size_t elem_size);
+bool queue_init(Queue *queue, size_t elem_size);
 
 // Gets the number of elements in the Queue
 size_t queue_size(const Queue *queue);

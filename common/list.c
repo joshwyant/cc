@@ -31,11 +31,14 @@ List *list_alloc(size_t elem_size)
     ASSERT(elem_size > 0);
     
     List *list = malloc(sizeof(List));
-    list_init(list, elem_size);
+    if (list && !list_init(list, elem_size)) {
+        free(list);
+        return NULL;
+    }
     return list;
 } // list_alloc
 
-void list_init(List *list, size_t elem_size) {
+bool list_init(List *list, size_t elem_size) {
     ASSERT(elem_size > 0);
 
     list->data = NULL;
@@ -44,6 +47,7 @@ void list_init(List *list, size_t elem_size) {
     list->elem_count = 0;
     list->reserve_count = 0;
     list->version = 0;
+    return true;
 } // list_init
 
 size_t list_size(const List *list)
@@ -152,7 +156,6 @@ void list_cleanup(List *list)
     list->data = NULL;
     list->data_size = 0;
     list->elem_count = 0;
-    list->elem_size = 0;
     list->reserve_count = 0;
     list->version++;
 } // list_cleanup
@@ -335,8 +338,11 @@ bool list_copy(List *dest_list, const List *list)
 }
 
 void *list_iter_current_(const Iterator *iter);
+void *list_iter_current_reverse_(const Iterator *iter);
 bool list_iter_eof_(const Iterator *iter);
+bool list_iter_eof_reverse_(const Iterator *iter);
 bool list_iter_move_next_(Iterator *iter);
+bool list_iter_move_next_reverse_(Iterator *iter);
 
 void *list_iter_current_(const Iterator *iter) {
     ASSERT(iter != NULL);
@@ -350,13 +356,34 @@ void *list_iter_current_(const Iterator *iter) {
     return list_get(list, iter->impl_data1);
 }
 
+void *list_iter_current_reverse_(const Iterator *iter) {
+    ASSERT(iter != NULL);
+    ASSERT(iter->collection_type == COLLECTION_LIST);
+    List *list = iter->collection;
+    ASSERT(list != NULL);
+    ASSERT(iter->version == list->version && "Collection changed while iterating.");
+    if (list_iter_eof_reverse_(iter)) {
+        return NULL;
+    }
+    return list_get(list, iter->impl_data1);
+}
+
 bool list_iter_eof_(const Iterator *iter) {
     ASSERT(iter != NULL);
     ASSERT(iter->collection_type == COLLECTION_LIST);
     List *list = iter->collection;
     ASSERT(list != NULL);
     ASSERT(iter->version == list->version && "Collection changed while iterating.");
-    return iter->impl_data1 < 0 || iter->impl_data1 >= list->elem_count;
+    return list_empty(list) || iter->impl_data1 >= list->elem_count;
+}
+
+bool list_iter_eof_reverse_(const Iterator *iter) {
+    ASSERT(iter != NULL);
+    ASSERT(iter->collection_type == COLLECTION_LIST);
+    List *list = iter->collection;
+    ASSERT(list != NULL);
+    ASSERT(iter->version == list->version && "Collection changed while iterating.");
+    return list_empty(list) || iter->impl_data1 < 0;
 }
 
 bool list_iter_move_next_(Iterator *iter) {
@@ -369,7 +396,7 @@ bool list_iter_move_next_(Iterator *iter) {
         return false;
     }
     iter->impl_data1++;
-    return true;
+    return !list_iter_eof_(iter);
 }
 
 bool list_iter_move_next_reverse_(Iterator *iter) {
@@ -378,11 +405,11 @@ bool list_iter_move_next_reverse_(Iterator *iter) {
     List *list = iter->collection;
     ASSERT(list != NULL);
     ASSERT(iter->version == list->version && "Collection changed while iterating.");
-    if (list_iter_eof_(iter)) {
+    if (list_iter_eof_reverse_(iter)) {
         return false;
     }
     iter->impl_data1--;
-    return true;
+    return !list_iter_eof_reverse_(iter);
 }
 
 // Gets an Iterator for this List
@@ -408,8 +435,8 @@ void list_get_reverse_iterator(const List *list, Iterator *iter)
     iter->collection_type = COLLECTION_LIST;
     iter->collection = (void*)list;
     iter->elem_size = list->elem_size;
-    iter->current = list_iter_current_;
-    iter->eof = list_iter_eof_;
+    iter->current = list_iter_current_reverse_;
+    iter->eof = list_iter_eof_reverse_;
     iter->move_next = list_iter_move_next_reverse_;
     iter->impl_data1 = list->elem_count; // Current index
     iter->impl_data2 = 0;

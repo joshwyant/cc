@@ -24,7 +24,7 @@ typedef struct LinkedListNode LinkedListNode;
 LinkedList *linked_list_alloc(size_t elem_size);
 
 // Initializes a pre-allocated LinkedList object
-void linked_list_init(LinkedList *list, size_t elem_size);
+bool linked_list_init(LinkedList *list, size_t elem_size);
 
 // Gets the number of elements in the LinkedList
 size_t linked_list_size(const LinkedList *list);

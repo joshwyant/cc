@@ -19,7 +19,7 @@ typedef enum {
 PriorityQueue *priority_queue_alloc(RelationalKeyInfo *key_info, size_t elem_size, PriorityQueueMode mode);
 
 // Initializes a pre-allocated PriorityQueue object
-void priority_queue_init(PriorityQueue *queue, RelationalKeyInfo *key_info, size_t elem_size, PriorityQueueMode mode);
+bool priority_queue_init(PriorityQueue *queue, RelationalKeyInfo *key_info, size_t elem_size, PriorityQueueMode mode);
 
 // Gets the number of elements in the PriorityQueue
 size_t priority_queue_size(const PriorityQueue *queue);

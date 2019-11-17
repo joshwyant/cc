@@ -109,6 +109,26 @@ int string_compare(const void *a, const void *b);
 
 int string_case_compare(const void *a, const void *b);
 
+bool int_eq(const void *a, const void *b);
+
+bool long_eq(const void *a, const void *b);
+
+bool char_eq(const void *a, const void *b);
+
+bool float_eq(const void *a, const void *b);
+
+bool double_eq(const void *a, const void *b);
+
+bool unsigned_int_eq(const void *a, const void *b);
+
+bool unsigned_long_eq(const void *a, const void *b);
+
+bool unsigned_char_eq(const void *a, const void *b);
+
+bool string_eq(const void *a, const void *b);
+
+bool string_case_eq(const void *a, const void *b);
+
 int int_hash(const void *key);
 
 int long_hash(const void *key);
@@ -128,5 +148,25 @@ int unsigned_char_hash(const void *key);
 int string_hash(const void *key);
 
 int string_case_hash(const void *key);
+
+extern KeyInfo IntKeyInfo;
+
+extern KeyInfo LongKeyInfo;
+
+extern KeyInfo CharKeyInfo;
+
+extern KeyInfo FloatKeyInfo;
+
+extern KeyInfo DoubleKeyInfo;
+
+extern KeyInfo UnsignedIntKeyInfo;
+
+extern KeyInfo UnsignedLongKeyInfo;
+
+extern KeyInfo UnsignedCharKeyInfo;
+
+extern KeyInfo StringKeyInfo;
+
+extern KeyInfo StringCaseKeyInfo;
 
 #endif // COMMON_ITERATOR_H__

@@ -206,6 +206,56 @@ int string_case_compare(const void *a, const void *b) {
     return strcasecmp((char*)a, (char*)b);
 }
 
+bool int_eq(const void *a, const void *b)
+{
+    return int_compare(a, b) == 0;
+}
+
+bool long_eq(const void *a, const void *b)
+{
+    return long_compare(a, b) == 0;
+}
+
+bool char_eq(const void *a, const void *b)
+{
+    return char_compare(a, b) == 0;
+}
+
+bool float_eq(const void *a, const void *b)
+{
+    return float_compare(a, b) == 0;
+}
+
+bool double_eq(const void *a, const void *b)
+{
+    return double_compare(a, b) == 0;
+}
+
+bool unsigned_int_eq(const void *a, const void *b)
+{
+    return unsigned_int_compare(a, b) == 0;
+}
+
+bool unsigned_long_eq(const void *a, const void *b)
+{
+    return unsigned_long_compare(a, b) == 0;
+}
+
+bool unsigned_char_eq(const void *a, const void *b)
+{
+    return unsigned_char_compare(a, b) == 0;
+}
+
+bool string_eq(const void *a, const void *b)
+{
+    return string_compare(a, b) == 0;
+}
+
+bool string_case_eq(const void *a, const void *b)
+{
+    return string_case_compare(a, b) == 0;
+}
+
 int int_hash(const void *key)
 {
     return *((int*)key) * 7;
@@ -263,3 +313,73 @@ int string_case_hash(const void *key)
     }
     return hash;
 }
+
+KeyInfo IntKeyInfo =
+{
+    sizeof(int*),
+    int_hash,
+    int_eq
+};
+
+KeyInfo LongKeyInfo =
+{
+    sizeof(long*),
+    long_hash,
+    long_eq
+};
+
+KeyInfo CharKeyInfo =
+{
+    sizeof(char*),
+    char_hash,
+    char_eq
+};
+
+KeyInfo FloatKeyInfo =
+{
+    sizeof(float*),
+    float_hash,
+    float_eq
+};
+
+KeyInfo DoubleKeyInfo =
+{
+    sizeof(double*),
+    double_hash,
+    double_eq
+};
+
+KeyInfo UnsignedIntKeyInfo =
+{
+    sizeof(unsigned int*),
+    unsigned_int_hash,
+    unsigned_int_eq
+};
+
+KeyInfo UnsignedLongKeyInfo =
+{
+    sizeof(unsigned long*),
+    unsigned_long_hash,
+    unsigned_long_eq
+};
+
+KeyInfo UnsignedCharKeyInfo =
+{
+    sizeof(unsigned char*),
+    unsigned_char_hash,
+    unsigned_char_eq
+};
+
+KeyInfo StringKeyInfo =
+{
+    sizeof(char**),
+    string_hash,
+    string_eq
+};
+
+KeyInfo StringCaseKeyInfo =
+{
+    sizeof(char**),
+    string_case_hash,
+    string_case_eq
+};

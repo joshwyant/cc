@@ -38,6 +38,7 @@ List *list_alloc(size_t elem_size) {
 } // list_alloc
 
 bool list_init(List *list, size_t elem_size) {
+  ASSERT(list != NULL);
   ASSERT(elem_size > 0);
 
   list->data = NULL;

@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "list": "c",
-        "map.h": "c"
+        "map.h": "c",
+        "typeinfo": "cpp"
     },
     "editor.formatOnSave": true,
     "editor.formatOnType": true

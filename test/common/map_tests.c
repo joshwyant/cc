@@ -21,6 +21,8 @@ TEST(map_basics) {
   assert(val1 == 1);
   assert(val2 == 2);
   assert(val3 == 3);
+
+  map_cleanup(&m);
 }
 
 int map_tests() { return test_map_basics(); }

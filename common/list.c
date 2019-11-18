@@ -357,7 +357,7 @@ bool list_iter_eof_(const Iterator *iter) {
   ASSERT(list != NULL);
   ASSERT(iter->version == list->version &&
          "Collection changed while iterating.");
-  return list_empty(list) || iter->impl_data1 >= list->elem_count;
+  return list_empty(list) || iter->impl_data1 >= (int)list->elem_count;
 }
 
 bool list_iter_eof_reverse_(const Iterator *iter) {

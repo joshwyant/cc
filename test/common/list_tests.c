@@ -1,5 +1,9 @@
 #include "list_tests.h"
 
+void test_string_foreach(char **item);
+
+void test_int_foreach(int *item);
+
 TEST(list_basics) {
   struct test t = {1, 2};
 
@@ -38,6 +42,30 @@ TEST(list_basics) {
   assert(list_size(list) == 3);
 
   list_free(list);
+
+  StringList *slist = StringListAlloc();
+  StringIterator siter;
+  StringListAppend(slist, "ABC");
+  StringListAppend(slist, "DEF");
+  StringListAppend(slist, "GHI");
+
+  // TODO: wrongly accepts any kind of list
+  // Also check to make sure container element sizes are the same.
+  StringListGetIterator(slist, &siter);
+  StringForEach(&siter, test_string_foreach);
+
+  IntList *ilist = IntListAlloc();
+  IntIterator iiter;
+  IntListAppend(ilist, 1);
+  IntListAppend(ilist, 2);
+  IntListAppend(ilist, 3);
+
+  IntListGetIterator(ilist, &iiter);
+  IntForEach(&iiter, test_int_foreach);
 }
 
 int list_tests() { return test_list_basics(); }
+
+void test_string_foreach(char **item) { printf("%s\n", *item); }
+
+void test_int_foreach(int *item) { printf("%d\n", *item); }

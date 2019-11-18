@@ -102,6 +102,10 @@ void iter_map(const Sink *dest, Iterator *iter,
 void iter_flat_map(const Sink *dest, Iterator *iter,
                    void (*map_fn)(Sink *dest, const void *elem));
 
+// TODO: sum, product, etc.
+void iter_reduce(const void *dest, Iterator *iter,
+                 void (*reduce_fn)(void *dest, const void *elem));
+
 void iter_filter(const Sink *dest, Iterator *iter,
                  bool (*filter_fn)(const void *elem));
 
@@ -111,13 +115,17 @@ void iter_filter(const Sink *dest, Iterator *iter,
   DECLARE_SINK_TYPE(name, type)                                                \
   extern KeyInfo name##KeyInfo;                                                \
   int hash_fn(const void *k);                                                  \
-  bool eq_fn(const void *_a, const void *_b);
+  bool eq_fn(const void *_a, const void *_b);                                  \
+  void name##ForEach(name##Iterator *iter, void (*action)(type * elem));
 
 #define DECLARE_CONTAINER(name, type)                                          \
   DECLARE_CONTAINER_FN(name, type, name##Hash, name##Eq)
 
 #define DEFINE_CONTAINER_FN(name, type, hash_fn, eq_fn)                        \
-  KeyInfo name##KeyInfo = {sizeof(type), hash_fn, eq_fn};
+  KeyInfo name##KeyInfo = {sizeof(type), hash_fn, eq_fn};                      \
+  void name##ForEach(name##Iterator *iter, void (*action)(type * elem)) {      \
+    for_each((Iterator *)iter, (void (*)(void *))action);                      \
+  }
 
 #define DEFINE_CONTAINER(name, type, hash_expr, eq_expr)                       \
   int name##Hash(const void *k) {                                              \

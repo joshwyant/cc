@@ -2,6 +2,7 @@
 #define TEST_COMMON_LIST_TESTS_H__
 
 #include "../../common/list.h"
+#include "../../common/list_generic.h"
 #include "../macros.h"
 
 // COPIED from list.c

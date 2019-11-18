@@ -4,12 +4,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct Iterator Iterator;
-
-typedef struct Sink Sink;
-
-typedef struct Indexer Indexer;
-
 typedef struct KeyInfo KeyInfo;
 
 typedef struct RelationalKeyInfo RelationalKeyInfo;
@@ -30,32 +24,48 @@ typedef enum {
   COLLECTION_CUSTOM = 1 << 9,
 } CollectionType;
 
-struct Iterator {
-  CollectionType collection_type;
-  void *collection;
-  size_t elem_size;
-  void *(*current)(const Iterator *iter);
-  bool (*move_next)(Iterator *iter);
-  bool (*eof)(const Iterator *iter);
-  int impl_data1;
-  int impl_data2;
-  int version;
-};
+#define DECLARE_ITERATOR_TYPE(name, type)                                      \
+  typedef struct name##Iterator name##Iterator;                                \
+  struct name##Iterator {                                                      \
+    CollectionType collection_type;                                            \
+    void *collection;                                                          \
+    size_t elem_size;                                                          \
+    type *(*current)(const name##Iterator *iter);                              \
+    bool (*move_next)(name##Iterator * iter);                                  \
+    bool (*eof)(const name##Iterator *iter);                                   \
+    int impl_data1;                                                            \
+    int impl_data2;                                                            \
+    int version;                                                               \
+  };
 
-struct Sink {
-  CollectionType collection_type;
-  void *collection;
-  size_t elem_size;
-  void *(*add)(const Sink *sink, const void *elem);
-};
+// Default (generic) iterator
+DECLARE_ITERATOR_TYPE(, void)
 
-struct Indexer {
-  CollectionType collection_type;
-  void *collection;
-  size_t elem_size;
-  size_t (*size)(const Indexer *indexer);
-  void *(*get)(const Indexer *indexer, size_t index);
-};
+#define DECLARE_SINK_TYPE(name, type)                                          \
+  typedef struct name##Sink name##Sink;                                        \
+  struct name##Sink {                                                          \
+    CollectionType collection_type;                                            \
+    void *collection;                                                          \
+    size_t elem_size;                                                          \
+    type *(*add)(const name##Sink *sink, const type *elem);                    \
+  };
+
+// Default (generic) sink
+DECLARE_SINK_TYPE(, void)
+
+#define DECLARE_INDEXER_TYPE(name, type)                                       \
+  typedef struct name##Indexer name##Indexer;                                  \
+  struct name##Indexer {                                                       \
+    CollectionType collection_type;                                            \
+    void *collection;                                                          \
+    size_t elem_size;                                                          \
+    size_t (*size)(const name##Indexer *indexer);                              \
+    type *(*get)(const name##Indexer *indexer, size_t index);                  \
+    void (*set)(name##Indexer * indexer, size_t index, const type *value);     \
+  };
+
+// Default (generic) indexer
+DECLARE_INDEXER_TYPE(, void)
 
 struct KeyInfo {
   size_t key_size;
@@ -64,7 +74,7 @@ struct KeyInfo {
 };
 
 struct RelationalKeyInfo {
-  KeyInfo key_info;
+  KeyInfo *key_info;
   int (*comare_fn)(const void *a, const void *b);
 };
 
@@ -95,84 +105,77 @@ void iter_flat_map(const Sink *dest, Iterator *iter,
 void iter_filter(const Sink *dest, Iterator *iter,
                  bool (*filter_fn)(const void *elem));
 
-int int_compare(const void *a, const void *b);
+#define DECLARE_CONTAINER_FN(name, type, hash_fn, eq_fn)                       \
+  DECLARE_ITERATOR_TYPE(name, type)                                            \
+  DECLARE_INDEXER_TYPE(name, type)                                             \
+  DECLARE_SINK_TYPE(name, type)                                                \
+  extern KeyInfo name##KeyInfo;                                                \
+  int hash_fn(const void *k);                                                  \
+  bool eq_fn(const void *_a, const void *_b);
 
-int long_compare(const void *a, const void *b);
+#define DECLARE_CONTAINER(name, type)                                          \
+  DECLARE_CONTAINER_FN(name, type, name##Hash, name##Eq)
 
-int char_compare(const void *a, const void *b);
+#define DEFINE_CONTAINER_FN(name, type, hash_fn, eq_fn)                        \
+  KeyInfo name##KeyInfo = {sizeof(type), hash_fn, eq_fn};
 
-int float_compare(const void *a, const void *b);
+#define DEFINE_CONTAINER(name, type, hash_expr, eq_expr)                       \
+  int name##Hash(const void *k) {                                              \
+    type key = *(const type *)k;                                               \
+    return (hash_expr);                                                        \
+  }                                                                            \
+  bool name##Eq(const void *_a, const void *_b) {                              \
+    type a = *(const type *)_a;                                                \
+    type b = *(const type *)_b;                                                \
+    return (eq_expr);                                                          \
+  }                                                                            \
+  DEFINE_CONTAINER_FN(name, type, name##Hash, name##Eq)
 
-int double_compare(const void *a, const void *b);
+#define DECLARE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)       \
+  DECLARE_CONTAINER_FN(name, type, hash_fn, name##Eq)                          \
+  extern RelationalKeyInfo name##RelationalKeyInfo;                            \
+  int compare_fn(const void *a, const void *b);
 
-int unsigned_int_compare(const void *a, const void *b);
+#define DECLARE_RELATIONAL_CONTAINER(name, type)                               \
+  DECLARE_RELATIONAL_CONTAINER_FN(name, type, name##Hash, name##Compare)
 
-int unsigned_long_compare(const void *a, const void *b);
+#define DEFINE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)        \
+  bool name##Eq(const void *a, const void *b) {                                \
+    return name##Compare(a, b) == 0;                                           \
+  }                                                                            \
+  DEFINE_CONTAINER_FN(name, type, hash_fn, name##Eq)                           \
+  RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, compare_fn};
 
-int unsigned_char_compare(const void *a, const void *b);
+#define DEFINE_RELATIONAL_CONTAINER(name, type, hash_expr, compare_expr)       \
+  int name##Compare(const void *_a, const void *_b) {                          \
+    type a = *(const type *)_a;                                                \
+    type b = *(const type *)_b;                                                \
+    return (compare_expr);                                                     \
+  }                                                                            \
+  DEFINE_CONTAINER(name, type, hash_expr, (name##Compare(_a, _b) == 0))        \
+  RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, name##Compare};
 
-int string_compare(const void *a, const void *b);
+#define DEFINE_RELATIONAL_CONTAINER_BASIC(name, type)                          \
+  DEFINE_RELATIONAL_CONTAINER(name, type, key * 7, a - b)
 
-int string_case_compare(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(Int, int);
 
-bool int_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(Long, long);
 
-bool long_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(Char, char);
 
-bool char_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(Float, float);
 
-bool float_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(Double, double);
 
-bool double_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(UnsignedInt, unsigned int);
 
-bool unsigned_int_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(UnsignedLong, unsigned long);
 
-bool unsigned_long_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(UnsignedChar, unsigned char);
 
-bool unsigned_char_eq(const void *a, const void *b);
+DECLARE_RELATIONAL_CONTAINER(String, char *);
 
-bool string_eq(const void *a, const void *b);
-
-bool string_case_eq(const void *a, const void *b);
-
-int int_hash(const void *key);
-
-int long_hash(const void *key);
-
-int char_hash(const void *key);
-
-int float_hash(const void *key);
-
-int double_hash(const void *key);
-
-int unsigned_int_hash(const void *key);
-
-int unsigned_long_hash(const void *key);
-
-int unsigned_char_hash(const void *key);
-
-int string_hash(const void *key);
-
-int string_case_hash(const void *key);
-
-extern KeyInfo IntKeyInfo;
-
-extern KeyInfo LongKeyInfo;
-
-extern KeyInfo CharKeyInfo;
-
-extern KeyInfo FloatKeyInfo;
-
-extern KeyInfo DoubleKeyInfo;
-
-extern KeyInfo UnsignedIntKeyInfo;
-
-extern KeyInfo UnsignedLongKeyInfo;
-
-extern KeyInfo UnsignedCharKeyInfo;
-
-extern KeyInfo StringKeyInfo;
-
-extern KeyInfo StringCaseKeyInfo;
+DECLARE_RELATIONAL_CONTAINER(StringCase, char *);
 
 #endif // COMMON_ITERATOR_H__

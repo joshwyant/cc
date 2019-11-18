@@ -8,9 +8,11 @@
                 "-D",
                 "TESTING",
                 "-g",
-                "${workspaceFolder}/common/**/*.c",
+                "${workspaceFolder}/common/*.c",
                 "-g",
-                "${workspaceFolder}/test/**/*.c",
+                "${workspaceFolder}/test/*.c",
+                "-g",
+                "${workspaceFolder}/test/common/*.c",
                 "-o",
                 "${workspaceFolder}/bin/test_common",
                 "-Wno-extern-initializer"

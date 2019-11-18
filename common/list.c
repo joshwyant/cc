@@ -447,6 +447,7 @@ void *list_sink_add_(const Sink *sink, const void *elem) {
 
 size_t list_indexer_size_(const Indexer *indexer);
 void *list_indexer_get_(const Indexer *indexer, size_t index);
+void list_indexer_set_(Indexer *indexer, size_t index, const void *data);
 
 // Gets an Indexer for this list
 void list_get_indexer(const List *list, Indexer *indexer) {
@@ -457,6 +458,7 @@ void list_get_indexer(const List *list, Indexer *indexer) {
   indexer->elem_size = list->elem_size;
   indexer->size = list_indexer_size_;
   indexer->get = list_indexer_get_;
+  indexer->set = list_indexer_set_;
 }
 
 size_t list_indexer_size_(const Indexer *indexer) {
@@ -470,5 +472,15 @@ void *list_indexer_get_(const Indexer *indexer, size_t index) {
   ASSERT(indexer != NULL);
   List *list = indexer->collection;
   ASSERT(list != NULL);
+  ASSERT(index >= 0 && index < list_size(list));
   return list->data + list->elem_size * index;
+}
+
+void list_indexer_set_(Indexer *indexer, size_t index, const void *data) {
+  ASSERT(indexer != NULL);
+  List *list = indexer->collection;
+  ASSERT(list != NULL);
+  ASSERT(index >= 0 && index < list_size(list));
+  ASSERT(data != NULL);
+  memcpy(list->data + list->elem_size * index, data, list->elem_size);
 }

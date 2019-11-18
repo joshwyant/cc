@@ -167,101 +167,15 @@ void iter_flat_map(const Sink *dest, Iterator *iter,
 void iter_filter(const Sink *dest, Iterator *iter,
                  bool (*filter_fn)(const void *elem)) {}
 
-int int_compare(const void *a, const void *b) {
-  return *((int *)a) - *((int *)b);
-}
-
-int long_compare(const void *a, const void *b) {
-  return *((long *)a) - *((long *)b);
-}
-
-int char_compare(const void *a, const void *b) {
-  return *((char *)a) - *((char *)b);
-}
-
-int float_compare(const void *a, const void *b) {
-  return *((float *)a) - *((float *)b);
-}
-
-int double_compare(const void *a, const void *b) {
-  return *((double *)a) - *((double *)b);
-}
-
-int unsigned_int_compare(const void *a, const void *b) {
-  return *((unsigned int *)a) - *((unsigned int *)b);
-}
-
-int unsigned_long_compare(const void *a, const void *b) {
-  return *((unsigned long *)a) - *((unsigned long *)b);
-}
-
-int unsigned_char_compare(const void *a, const void *b) {
-  return *((unsigned char *)a) - *((unsigned char *)b);
-}
-
-int string_compare(const void *a, const void *b) {
+int StringCompare(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
 }
 
-int string_case_compare(const void *a, const void *b) {
+int StringCaseCompare(const void *a, const void *b) {
   return strcasecmp((char *)a, (char *)b);
 }
 
-bool int_eq(const void *a, const void *b) { return int_compare(a, b) == 0; }
-
-bool long_eq(const void *a, const void *b) { return long_compare(a, b) == 0; }
-
-bool char_eq(const void *a, const void *b) { return char_compare(a, b) == 0; }
-
-bool float_eq(const void *a, const void *b) { return float_compare(a, b) == 0; }
-
-bool double_eq(const void *a, const void *b) {
-  return double_compare(a, b) == 0;
-}
-
-bool unsigned_int_eq(const void *a, const void *b) {
-  return unsigned_int_compare(a, b) == 0;
-}
-
-bool unsigned_long_eq(const void *a, const void *b) {
-  return unsigned_long_compare(a, b) == 0;
-}
-
-bool unsigned_char_eq(const void *a, const void *b) {
-  return unsigned_char_compare(a, b) == 0;
-}
-
-bool string_eq(const void *a, const void *b) {
-  return string_compare(a, b) == 0;
-}
-
-bool string_case_eq(const void *a, const void *b) {
-  return string_case_compare(a, b) == 0;
-}
-
-int int_hash(const void *key) { return *((int *)key) * 7; }
-
-int long_hash(const void *key) {
-  return *((int *)key) * 7 + *((int *)(key + 4)) * 13;
-}
-
-int char_hash(const void *key) { return *((char *)key) * 7; }
-
-int float_hash(const void *key) { return *((int *)key) * 7; }
-
-int double_hash(const void *key) {
-  return *((int *)key) * 7 + *((int *)(key + 4)) * 13;
-}
-
-int unsigned_int_hash(const void *key) { return *((int *)key) * 7; }
-
-int unsigned_long_hash(const void *key) {
-  return *((int *)key) * 7 + *((int *)(key + 4)) * 13;
-}
-
-int unsigned_char_hash(const void *key) { return *((unsigned char *)key) * 7; }
-
-int string_hash(const void *key) {
+int StringHash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * *c;
@@ -269,7 +183,7 @@ int string_hash(const void *key) {
   return hash;
 }
 
-int string_case_hash(const void *key) {
+int StringCaseHash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * toupper(*c);
@@ -277,25 +191,23 @@ int string_case_hash(const void *key) {
   return hash;
 }
 
-KeyInfo IntKeyInfo = {sizeof(int *), int_hash, int_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(Int, int)
 
-KeyInfo LongKeyInfo = {sizeof(long *), long_hash, long_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(Long, long)
 
-KeyInfo CharKeyInfo = {sizeof(char *), char_hash, char_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(Char, char)
 
-KeyInfo FloatKeyInfo = {sizeof(float *), float_hash, float_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(Float, float)
 
-KeyInfo DoubleKeyInfo = {sizeof(double *), double_hash, double_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(Double, double)
 
-KeyInfo UnsignedIntKeyInfo = {sizeof(unsigned int *), unsigned_int_hash,
-                              unsigned_int_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedInt, unsigned int)
 
-KeyInfo UnsignedLongKeyInfo = {sizeof(unsigned long *), unsigned_long_hash,
-                               unsigned_long_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedLong, unsigned long)
 
-KeyInfo UnsignedCharKeyInfo = {sizeof(unsigned char *), unsigned_char_hash,
-                               unsigned_char_eq};
+DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedChar, unsigned char)
 
-KeyInfo StringKeyInfo = {sizeof(char **), string_hash, string_eq};
+DEFINE_RELATIONAL_CONTAINER_FN(String, char *, StringHash, StringCompare)
 
-KeyInfo StringCaseKeyInfo = {sizeof(char **), string_case_hash, string_case_eq};
+DEFINE_RELATIONAL_CONTAINER_FN(StringCase, char *, StringCaseHash,
+                               StringCompare)

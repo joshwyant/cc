@@ -2,7 +2,8 @@
     "files.associations": {
         "list": "c",
         "map.h": "c",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "iterator": "cpp"
     },
     "editor.formatOnSave": true,
     "editor.formatOnType": true

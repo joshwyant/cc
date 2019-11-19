@@ -124,7 +124,9 @@ int StringCase_hash(const void *key);
   extern KeyInfo name##KeyInfo;                                                \
   int hash_fn(const void *k);                                                  \
   bool eq_fn(const void *_a, const void *_b);                                  \
-  void name##_for_each(name##Iterator *iter, void (*action)(type * elem));
+  void name##_for_each(name##Iterator *iter, void (*action)(type * elem));\
+  type name##_reduce(const type initial, name##Iterator *iter,\
+                     type (*reduce_fn)(const type accum, const type elem));
 
 #define DECLARE_CONTAINER(name, type)                                          \
   DECLARE_CONTAINER_FN(name, type, name##_hash, name##_eq)
@@ -145,6 +147,20 @@ int StringCase_hash(const void *key);
     type b = *(const type *)_b;                                                \
     return (eq_expr);                                                          \
   }                                                                            \
+  type (*_##name##_current_reduce_fn)(const type, const type) = NULL;          \
+  void _##name##__reduce(const void *dest, const void *elem) {                 \
+    *(type *)dest =                                                            \
+        _##name##_current_reduce_fn(*(const type *)dest, *(const type *)elem); \
+  }                                                                            \
+  type name##_reduce(const type initial, name##Iterator *iter,                 \
+                     type (*reduce_fn)(const type accum, const type elem)) {   \
+    type (*last_fn)(const type, const type) = _##name##_current_reduce_fn;     \
+    _##name##_current_reduce_fn = reduce_fn;                                   \
+    Iterator_reduce(&initial, (Iterator *)iter,                                \
+                    (void (*)(void *, const void *))_##name##__reduce);        \
+    _##name##_current_reduce_fn = last_fn;                                     \
+    return initial;                                                            \
+  }                                                                            \
   DEFINE_CONTAINER_FN(name, type, name##_hash, name##_eq)
 
 #define DECLARE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)       \
@@ -154,6 +170,16 @@ int StringCase_hash(const void *key);
 
 #define DECLARE_RELATIONAL_CONTAINER(name, type)                               \
   DECLARE_RELATIONAL_CONTAINER_FN(name, type, name##_hash, name##_compare)
+
+#define DECLARE_CONTAINER_REDUCER(name, type, func_name) \
+  type name##_##func_name(name##Iterator *iter);
+
+#define DECLARE_RELATIONAL_CONTAINER_BASIC(name, type) \
+  DECLARE_RELATIONAL_CONTAINER(name, type) \
+  DECLARE_CONTAINER_REDUCER(name, type, sum) \
+  DECLARE_CONTAINER_REDUCER(name, type, product) \
+  DECLARE_CONTAINER_REDUCER(name, type, min) \
+  DECLARE_CONTAINER_REDUCER(name, type, max) 
 
 #define DEFINE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)        \
   bool name##_eq(const void *a, const void *b) {                               \
@@ -171,8 +197,18 @@ int StringCase_hash(const void *key);
   DEFINE_CONTAINER(name, type, hash_expr, (name##_compare(_a, _b) == 0))       \
   RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, name##_compare};
 
+#define DEFINE_CONTAINER_REDUCER(name, type, func_name, initial, expr) \
+  type _##name##__##func_name(const type a, const type b) { return (expr); }\
+  type name##_##func_name(name##Iterator *iter) {\
+    return name##_reduce((initial), iter, _##name##__##func_name);\
+  }
+
 #define DEFINE_RELATIONAL_CONTAINER_BASIC(name, type)                          \
-  DEFINE_RELATIONAL_CONTAINER(name, type, key * 7, a - b)
+  DEFINE_RELATIONAL_CONTAINER(name, type, key * 7, a - b)\
+  DEFINE_CONTAINER_REDUCER(name, type, sum, 0, a + b) \
+  DEFINE_CONTAINER_REDUCER(name, type, product, 1, a * b) \
+  DEFINE_CONTAINER_REDUCER(name, type, min, (type)0x7FFFFFFFFFFFFFFF, a <= b ? a : b) \
+  DEFINE_CONTAINER_REDUCER(name, type, max, (type)0x8000000000000000, a >= b ? a : b)
 
 DECLARE_RELATIONAL_CONTAINER(Int, int);
 

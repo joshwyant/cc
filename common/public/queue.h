@@ -53,7 +53,7 @@ void Queue_clear(Queue *queue);
 // Copies a queue. Returns whether successful.
 bool Queue_copy(Queue *dest_queue, const Queue *queue);
 
-// Gets an Iterator for this Queue. The iterator modifies the queue!
+// Gets an Iterator for this Queue. Maintains FIFO order.
 void Queue_get_iterator(const Queue *queue, Iterator *iter);
 
 // Gets a Sink for this queue. Maintains FIFO order.

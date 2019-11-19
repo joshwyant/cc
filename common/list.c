@@ -1,11 +1,11 @@
-#include "list.h"
+#include "public/list.h"
 
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "../test/stubs.h"
-#include "assert.h"
+#include "public/assert.h"
 
 bool List_init(List *list, size_t elem_size);
 
@@ -30,7 +30,26 @@ struct List {
   int version;
 };
 
-List *List_alloc(size_t elem_size) {
+DEFINE_LIST(Int, int);
+
+DEFINE_LIST(Long, long);
+
+DEFINE_LIST(Char, char);
+
+DEFINE_LIST(Float, float);
+
+DEFINE_LIST(Double, double);
+
+DEFINE_LIST(UnsignedInt, unsigned int);
+
+DEFINE_LIST(UnsignedLong, unsigned long);
+
+DEFINE_LIST(UnsignedChar, unsigned char);
+
+DEFINE_LIST(String, char *);
+
+List *List_alloc(size_t elem_size) 
+{
   ASSERT(elem_size > 0);
 
   List *list = malloc(sizeof(List));
@@ -39,9 +58,10 @@ List *List_alloc(size_t elem_size) {
     return NULL;
   }
   return list;
-} // List_alloc
+}
 
-bool List_init(List *list, size_t elem_size) {
+bool List_init(List *list, size_t elem_size) 
+{
   ASSERT(list != NULL);
   ASSERT(elem_size > 0);
 
@@ -52,27 +72,28 @@ bool List_init(List *list, size_t elem_size) {
   list->reserve_count = 0;
   list->version = 0;
   return true;
-} // List_init
+}
 
-size_t List_count(const List *list) {
+size_t List_count(const List *list) 
+{
   ASSERT(list != NULL);
-
   return list->elem_count;
-} // List_count
+}
 
-bool List_empty(const List *list) {
+bool List_empty(const List *list) 
+{
   ASSERT(list != NULL);
-
   return list->elem_count == 0;
-} // List_size
+}
 
-size_t List_capacity(const List *list) {
+size_t List_capacity(const List *list) 
+{
   ASSERT(list != NULL);
-
   return list->data_size / list->elem_size;
-} // List_capacity
+}
 
-bool List_reserve(List *list, size_t num_elems) {
+bool _List_reserve_ext(List *list, size_t num_elems, bool slim) 
+{
   ASSERT(list != NULL);
   ASSERT(num_elems >= 0);
 
@@ -84,18 +105,31 @@ bool List_reserve(List *list, size_t num_elems) {
   while (reserve_count < num_elems) {
     reserve_count <<= 1;
   }
-  size_t new_data_size = list->elem_size * reserve_count;
+  size_t new_data_size = list->elem_size * (slim ? num_elems : reserve_count);
   void *data = NULL;
   if ((data = realloc(list->data, new_data_size)) == NULL) {
     return false;
   }
   list->data = data;
   list->reserve_count = reserve_count;
-  list->data_size = reserve_count * list->elem_size;
+  list->data_size = (slim ? num_elems : reserve_count) * list->elem_size;
   return true;
-} // List_reserve
+} // _List_reserve_ext
 
-bool List_trim(List *list) {
+bool List_reserve(List *list, size_t num_elems) 
+{
+  return _List_reserve_ext(list, num_elems, true);
+}
+
+bool List_expand(List *list, size_t num_elems)
+{
+  if (!List_reserve(list, num_elems)) return false;
+  list->elem_count = num_elems;
+  return true;
+}
+
+bool List_trim(List *list) 
+{
   ASSERT(list != NULL);
 
   if (list->elem_count == 0) {
@@ -109,13 +143,11 @@ bool List_trim(List *list) {
   }
   if (list->elem_count < list->reserve_count) {
     // Allocate and copy the data
-    void *data = malloc(list->elem_size * list->elem_count);
+    void *data = realloc(list->data, list->elem_size * list->elem_count);
     if (!data) {
       return false;
     }
     list->data_size = list->elem_size * list->elem_count;
-    memcpy(data, list->data, list->data_size);
-    free(list->data);
     list->data = data;
     // Lower the potential capacity.
     while ((list->reserve_count >> 1) >= list->elem_count) {
@@ -125,14 +157,15 @@ bool List_trim(List *list) {
   return true;
 } // List_trim
 
-void List_free(List *list) {
+void List_free(List *list) 
+{
   ASSERT(list != NULL);
-
   List_cleanup(list);
   free(list);
-} // List_free
+}
 
-void List_cleanup(List *list) {
+void List_cleanup(List *list) 
+{
   ASSERT(list != NULL);
 
   if (list->data) {
@@ -145,37 +178,39 @@ void List_cleanup(List *list) {
   list->version++;
 } // List_cleanup
 
-size_t List_element_size(const List *list) {
+size_t List_element_size(const List *list) 
+{
   ASSERT(list != NULL);
-
   return list->elem_size;
-} // List_element_size
+}
 
 // Gets the data for the list.
 void *List_get_data(const List *list) {
   ASSERT(list != NULL);
-
   return list->data;
-} // List_get_data
+}
 
 // Gets the item at `index'
-void *List_get(const List *list, size_t index) {
+void *List_get(const List *list, size_t index) 
+{
   ASSERT(list != NULL);
   ASSERT(index >= 0);
   ASSERT(index < list->elem_count && "index is greater than list size.");
 
   return list->data + list->elem_size * index;
-} // List_get
+}
 
 // Sets the item at `index' to the given data.
 // `index' must be within the bounds of the list.
-void List_set(List *list, size_t index, const void *elem) {
+void List_set(List *list, size_t index, const void *elem) 
+{
   List_set_range(list, index, elem, 1);
-} // List_set
+}
 
 // Sets the data at `index' to the given data.
 // `index' and data must be within the bounds of the list.
-void List_set_range(List *list, size_t index, const void *elems, int count) {
+void List_set_range(List *list, size_t index, const void *elems, int count) 
+{
   ASSERT(list != NULL);
   ASSERT(index >= 0);
   ASSERT(index < list->elem_count && "index is >= list size.");
@@ -187,14 +222,16 @@ void List_set_range(List *list, size_t index, const void *elems, int count) {
   memcpy(list->data + list->elem_size * index, elems, list->elem_size * count);
 
   list->version++;
-} // List_set_range
+}
 
-void *List_insert(List *list, size_t index, const void *elem) {
+void *List_insert(List *list, size_t index, const void *elem) 
+{
   return List_insert_range(list, index, elem, 1);
-} // List_insert
+}
 
 void *List_insert_range(List *list, size_t index, const void *elems,
-                        size_t count) {
+                        size_t count) 
+{
   ASSERT(list != NULL);
   ASSERT(index >= 0);
   ASSERT(elems != NULL);
@@ -205,7 +242,7 @@ void *List_insert_range(List *list, size_t index, const void *elems,
   if (count == 0) {
     return NULL; // No-op case
   }
-  if (!List_reserve(list, list->elem_count + count)) {
+  if (!_List_reserve_ext(list, list->elem_count + count, false)) {
     return NULL;
   }
   size_t shifted_count = list->elem_count - index;
@@ -227,35 +264,37 @@ void *List_insert_range(List *list, size_t index, const void *elems,
 
 // Appends the given element to the end of the list.
 // Returns a pointer to the appended element. Returns NULL if unsuccessful.
-void *List_add(List *list, const void *elem) {
-  ASSERT(list != NULL);
-
+void *List_add(List *list, const void *elem) 
+{
   return List_insert_range(list, list->elem_count, elem, 1);
-} // List_add
+}
 
 // Appends the given element to the end of the list.
 // Returns a pointer to the appended element. Returns NULL if unsuccessful.
-void *List_add_range(List *list, const void *elems, size_t count) {
-  ASSERT(list != NULL);
-
+void *List_add_range(List *list, const void *elems, size_t count) 
+{
   return List_insert_range(list, list->elem_count, elems, count);
-} // List_add_range
+}
 
 // Removes an element from the list.
-void List_remove(List *list, size_t start_index) {
-  ASSERT(list != NULL);
-
+void List_remove(List *list, size_t start_index)
+{
   List_remove_range(list, start_index, 1); // Additional assertions done here
-} // List_remove
+}
 
-void List_clear(List *list) {
-  ASSERT(list != NULL);
+void List_clear(List *list) 
+{
+  List_truncate(list, 0);
+}
 
-  List_remove_range(list, 0, list->elem_count);
+void List_truncate(List *list, size_t start_index) 
+{
+  List_remove_range(list, start_index, list->elem_count - start_index);
 }
 
 // Removes a range of elements from the list.
-void List_remove_range(List *list, size_t start_index, size_t count) {
+void List_remove_range(List *list, size_t start_index, size_t count) 
+{
   ASSERT(list != NULL);
   ASSERT(start_index >= 0);
   ASSERT(start_index <= list->elem_count);
@@ -274,9 +313,13 @@ void List_remove_range(List *list, size_t start_index, size_t count) {
       list->reserve_count >>= 1;
     } while (list->reserve_count >> 1 > list->elem_count - count);
     new_data = malloc(list->reserve_count * list->elem_size);
-    if (start_index > 0) {
-      // Copy the first part of the old data.
-      memcpy(new_data, list->data, start_index * list->elem_size);
+    if (new_data == NULL) {
+      new_data = list->data;
+    } else {
+      if (list->data && start_index > 0) {
+        // Copy the first part of the old data.
+        memcpy(new_data, list->data, start_index * list->elem_size);
+      }
     }
   }
   if (count > 0 && start_index + count < list->elem_count) {
@@ -285,15 +328,16 @@ void List_remove_range(List *list, size_t start_index, size_t count) {
            list->elem_size * (start_index + count) + list->data,
            list->elem_size * count);
   }
-  if (new_data != list->data) {
+  if (new_data && new_data != list->data) {
     free(list->data);
   }
   list->elem_count -= count;
   list->data = new_data;
-}
+} // List_remove_range
 
 // Copies a list. Returns whether successful.
-bool List_copy(List *dest_list, const List *list) {
+bool List_copy(List *dest_list, const List *list) 
+{
   ASSERT(dest_list != NULL);
   ASSERT(list != NULL);
   ASSERT(list->elem_size == dest_list->elem_size);
@@ -308,7 +352,7 @@ bool List_copy(List *dest_list, const List *list) {
   memcpy(dest_list->data, list->data, list->elem_size * list->elem_count);
   dest_list->elem_count = list->elem_count;
   return true;
-}
+} // List_copy
 
 void *List_iter_current_(const Iterator *iter);
 void *List_iter_current_reverse_(const Iterator *iter);
@@ -317,7 +361,8 @@ bool List_iter_eof_reverse_(const Iterator *iter);
 bool List_iter_move_next_(Iterator *iter);
 bool List_iter_move_next_reverse_(Iterator *iter);
 
-void *List_iter_current_(const Iterator *iter) {
+void *List_iter_current_(const Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -330,7 +375,8 @@ void *List_iter_current_(const Iterator *iter) {
   return List_get(list, iter->impl_data1);
 }
 
-void *List_iter_current_reverse_(const Iterator *iter) {
+void *List_iter_current_reverse_(const Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -343,7 +389,8 @@ void *List_iter_current_reverse_(const Iterator *iter) {
   return List_get(list, iter->impl_data1);
 }
 
-bool List_iter_eof_(const Iterator *iter) {
+bool List_iter_eof_(const Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -353,7 +400,8 @@ bool List_iter_eof_(const Iterator *iter) {
   return List_empty(list) || iter->impl_data1 >= (int)list->elem_count;
 }
 
-bool List_iter_eof_reverse_(const Iterator *iter) {
+bool List_iter_eof_reverse_(const Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -363,7 +411,8 @@ bool List_iter_eof_reverse_(const Iterator *iter) {
   return List_empty(list) || iter->impl_data1 < 0;
 }
 
-bool List_iter_move_next_(Iterator *iter) {
+bool List_iter_move_next_(Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -377,7 +426,8 @@ bool List_iter_move_next_(Iterator *iter) {
   return !List_iter_eof_(iter);
 }
 
-bool List_iter_move_next_reverse_(Iterator *iter) {
+bool List_iter_move_next_reverse_(Iterator *iter) 
+{
   ASSERT(iter != NULL);
   ASSERT(iter->collection_type == COLLECTION_LIST);
   List *list = iter->collection;
@@ -392,7 +442,8 @@ bool List_iter_move_next_reverse_(Iterator *iter) {
 }
 
 // Gets an Iterator for this List
-void List_get_iterator(const List *list, Iterator *iter) {
+void List_get_iterator(const List *list, Iterator *iter) 
+{
   ASSERT(list != NULL);
   ASSERT(iter != NULL);
   iter->collection_type = COLLECTION_LIST;
@@ -406,7 +457,8 @@ void List_get_iterator(const List *list, Iterator *iter) {
   iter->version = list->version;
 }
 
-void List_get_reverse_iterator(const List *list, Iterator *iter) {
+void List_get_reverse_iterator(const List *list, Iterator *iter) 
+{
   ASSERT(list != NULL);
   ASSERT(iter != NULL);
   iter->collection_type = COLLECTION_LIST;
@@ -422,7 +474,8 @@ void List_get_reverse_iterator(const List *list, Iterator *iter) {
 
 void *List_sink_add_(const Sink *sink, const void *elem);
 
-void List_get_sink(const List *list, Sink *sink) {
+void List_get_sink(const List *list, Sink *sink) 
+{
   ASSERT(list != NULL);
   ASSERT(sink != NULL);
   sink->collection_type = COLLECTION_LIST;
@@ -431,7 +484,8 @@ void List_get_sink(const List *list, Sink *sink) {
   sink->add = List_sink_add_;
 }
 
-void *List_sink_add_(const Sink *sink, const void *elem) {
+void *List_sink_add_(const Sink *sink, const void *elem) 
+{
   ASSERT(sink != NULL);
   List *list = sink->collection;
   ASSERT(list != NULL);
@@ -443,7 +497,8 @@ void *List_indexer_get_(const Indexer *indexer, size_t index);
 void List_indexer_set_(Indexer *indexer, size_t index, const void *data);
 
 // Gets an Indexer for this list
-void List_get_indexer(const List *list, Indexer *indexer) {
+void List_get_indexer(const List *list, Indexer *indexer) 
+{
   ASSERT(list != NULL);
   ASSERT(indexer != NULL);
   indexer->collection_type = COLLECTION_LIST;
@@ -454,14 +509,16 @@ void List_get_indexer(const List *list, Indexer *indexer) {
   indexer->set = List_indexer_set_;
 }
 
-size_t List_indexer_size_(const Indexer *indexer) {
+size_t List_indexer_size_(const Indexer *indexer) 
+{
   ASSERT(indexer != NULL);
   List *list = indexer->collection;
   ASSERT(list != NULL);
   return list->elem_count;
 }
 
-void *List_indexer_get_(const Indexer *indexer, size_t index) {
+void *List_indexer_get_(const Indexer *indexer, size_t index) 
+{
   ASSERT(indexer != NULL);
   List *list = indexer->collection;
   ASSERT(list != NULL);
@@ -469,7 +526,8 @@ void *List_indexer_get_(const Indexer *indexer, size_t index) {
   return list->data + list->elem_size * index;
 }
 
-void List_indexer_set_(Indexer *indexer, size_t index, const void *data) {
+void List_indexer_set_(Indexer *indexer, size_t index, const void *data) 
+{
   ASSERT(indexer != NULL);
   List *list = indexer->collection;
   ASSERT(list != NULL);

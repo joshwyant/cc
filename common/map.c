@@ -1,12 +1,12 @@
-#include "map.h"
+#include "public/map.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 #include "../test/stubs.h"
-#include "assert.h"
-#include "iterator.h"
-#include "list.h"
+#include "public/assert.h"
+#include "public/iterator.h"
+#include "public/list.h"
 
 // TODO:
 // - Version

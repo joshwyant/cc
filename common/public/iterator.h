@@ -1,5 +1,5 @@
-#ifndef COMMON_ITERATOR_H__
-#define COMMON_ITERATOR_H__
+#ifndef COMMON_PUBLIC_ITERATOR_H__
+#define COMMON_PUBLIC_ITERATOR_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -230,4 +230,4 @@ DECLARE_RELATIONAL_CONTAINER(String, char *);
 
 DECLARE_RELATIONAL_CONTAINER(StringCase, char *);
 
-#endif // COMMON_ITERATOR_H__
+#endif // COMMON_PUBLIC_ITERATOR_H__

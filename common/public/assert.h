@@ -1,5 +1,5 @@
-#ifndef COMMON_ASSERT_H__
-#define COMMON_ASSERT_H__
+#ifndef COMMON_PUBLIC_ASSERT_H__
+#define COMMON_PUBLIC_ASSERT_H__
 
 #include <assert.h>
 #include <stdbool.h>
@@ -13,4 +13,4 @@
   } while (false)
 #endif // NDEBUG
 
-#endif // COMMON_ASSERT_H__
+#endif // COMMON_PUBLIC_ASSERT_H__

@@ -1,4 +1,4 @@
-#include "array.h"
+#include "public/array.h"
 
 // STUB
 void *Array_get_data(const Array *array) { return NULL; }

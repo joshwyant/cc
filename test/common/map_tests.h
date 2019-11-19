@@ -1,8 +1,8 @@
 #ifndef TEST_COMMON_MAP_TESTS_H__
 #define TEST_COMMON_MAP_TESTS_H__
 
-#include "../../common/list.h"
-#include "../../common/map.h"
+#include "../../common/public/list.h"
+#include "../../common/public/map.h"
 #include "../macros.h"
 
 // COPIED from map.c

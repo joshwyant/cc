@@ -1,5 +1,5 @@
-#ifndef COMMON_ARRAY_H__
-#define COMMON_ARRAY_H__
+#ifndef COMMON_PUBLIC_ARRAY_H__
+#define COMMON_PUBLIC_ARRAY_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -54,4 +54,4 @@ void Array_get_reverse_sink(const Array *array, Sink *sink);
 // Gets an Indexer for this array
 void Array_get_indexer(const Array *array, Indexer *indexer);
 
-#endif // COMMON_ARRAY_H__
+#endif // COMMON_PUBLIC_ARRAY_H__

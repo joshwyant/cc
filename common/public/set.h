@@ -1,5 +1,5 @@
-#ifndef COMMON_SET_H__
-#define COMMON_SET_H__
+#ifndef COMMON_PUBLIC_SET_H__
+#define COMMON_PUBLIC_SET_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -75,4 +75,4 @@ bool Set_symmetric_difference_with(Set *dest_set, const Set *set);
 // Gets an Iterator for this Set in an undefined order.
 void Set_get_iterator(const Set *set, Iterator *iter);
 
-#endif // COMMON_SET_H__
+#endif // COMMON_PUBLIC_SET_H__

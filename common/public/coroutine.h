@@ -1,5 +1,5 @@
-#ifndef COMMON_COROUTINE_H__
-#define COMMON_COROUTINE_H__
+#ifndef COMMON_PUBLIC_COROUTINE_H__
+#define COMMON_PUBLIC_COROUTINE_H__
 
 #include "iterator.h"
 
@@ -23,4 +23,4 @@
 
 #define ITERATOR_END } // TODO: return EOF here
 
-#endif // COMMON_COROUTINE_H__
+#endif // COMMON_PUBLIC_COROUTINE_H__

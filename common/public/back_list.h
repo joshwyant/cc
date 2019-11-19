@@ -1,5 +1,5 @@
-#ifndef COMMON_BACK_LIST_H__
-#define COMMON_BACK_LIST_H__
+#ifndef COMMON_PUBLIC_BACK_LIST_H__
+#define COMMON_PUBLIC_BACK_LIST_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -116,4 +116,4 @@ void BackList_get_sink(const BackList *list, Sink *sink);
 // Gets a reverse Sink for this list
 void BackList_get_reverse_sink(const BackList *list, Sink *sink);
 
-#endif // COMMON_BACK_LIST_H__
+#endif // COMMON_PUBLIC_BACK_LIST_H__

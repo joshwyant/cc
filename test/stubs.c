@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/iterator.h"
-#include "../common/map.h"
+#include "../common/public/iterator.h"
+#include "../common/public/map.h"
 
 // Save pointers to the standard library versions here:
 void *(*_cmalloc)(size_t) = malloc;

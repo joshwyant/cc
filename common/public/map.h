@@ -1,5 +1,5 @@
-#ifndef COMMON_MAP_H__
-#define COMMON_MAP_H__
+#ifndef COMMON_PUBLIC_MAP_H__
+#define COMMON_PUBLIC_MAP_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -84,4 +84,4 @@ void Map_get_key_iterator(const Map *map, Iterator *iter);
 // Gets a value Iterator for this Map in an undefined order.
 void Map_get_value_iterator(const Map *map, Iterator *iter);
 
-#endif // COMMON_MAP_H__
+#endif // COMMON_PUBLIC_MAP_H__

@@ -1,19 +1,19 @@
-#include "iterator.h"
+#include "public/iterator.h"
 
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "array.h"
-#include "assert.h"
-#include "back_list.h"
-#include "linked_list.h"
-#include "list.h"
-#include "map.h"
-#include "priority_queue.h"
-#include "queue.h"
-#include "set.h"
-#include "stack.h"
+#include "public/array.h"
+#include "public/assert.h"
+#include "public/back_list.h"
+#include "public/linked_list.h"
+#include "public/list.h"
+#include "public/map.h"
+#include "public/priority_queue.h"
+#include "public/queue.h"
+#include "public/set.h"
+#include "public/stack.h"
 
 void for_each(Iterator *iter, void (*action)(void *elem)) {
   ASSERT(iter != NULL);

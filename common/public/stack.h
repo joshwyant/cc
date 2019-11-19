@@ -1,5 +1,5 @@
-#ifndef COMMON_STACK_H__
-#define COMMON_STACK_H__
+#ifndef COMMON_PUBLIC_STACK_H__
+#define COMMON_PUBLIC_STACK_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -69,4 +69,4 @@ void Stack_get_sink(const Stack *stack, Sink *sink);
 // Gets an Indexer for this stack. Index 0 is the oldest item in the stack.
 void Stack_get_indexer(const Stack *stack, Indexer *indexer);
 
-#endif // COMMON_STACK_H__
+#endif // COMMON_PUBLIC_STACK_H__

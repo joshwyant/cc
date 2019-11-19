@@ -1,5 +1,5 @@
-#ifndef COMMON_PRIORITY_QUEUE_H__
-#define COMMON_PRIORITY_QUEUE_H__
+#ifndef COMMON_PUBLIC_PRIORITY_QUEUE_H__
+#define COMMON_PUBLIC_PRIORITY_QUEUE_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -55,13 +55,13 @@ void *PriorityQueue_enqueue(PriorityQueue *queue, const void *key,
                              const void *data);
 
 // Removes an item from the queue and stores it in the given location.
-void PriorityQueue_dequeue(PriorityQueue *queue, const void *key_out,
-                            const void *data_out);
+bool PriorityQueue_dequeue(PriorityQueue *queue, void *key_out,
+                           void *data_out);
 
 // Peeks the highest priority item in the queue and stores it in the given
 // location.
-void PriorityQueue_peek(PriorityQueue *queue, const void *key_out,
-                         const void *data_out);
+bool PriorityQueue_peek(PriorityQueue *queue, void *key_out,
+                         void *data_out);
 
 // Removes all the items from the queue.
 // Remember to clean up memory first.
@@ -77,4 +77,4 @@ void PriorityQueue_get_iterator(const PriorityQueue *queue, Iterator *iter);
 // Gets a Sink for this queue.
 void PriorityQueue_get_sink(const PriorityQueue *queue, Sink *sink);
 
-#endif // COMMON_PRIORITY_QUEUE_H__
+#endif // COMMON_PUBLIC_PRIORITY_QUEUE_H__

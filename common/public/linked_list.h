@@ -1,5 +1,5 @@
-#ifndef COMMON_LINKED_LIST_H__
-#define COMMON_LINKED_LIST_H__
+#ifndef COMMON_PUBLIC_LINKED_LIST_H__
+#define COMMON_PUBLIC_LINKED_LIST_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -109,4 +109,4 @@ void LinkedList_get_sink(const LinkedList *list, Sink *sink);
 // Gets a reverse Sink for this list
 void LinkedList_get_reverse_sink(const LinkedList *list, Sink *sink);
 
-#endif // COMMON_LINKED_LIST_H__
+#endif // COMMON_PUBLIC_LINKED_LIST_H__

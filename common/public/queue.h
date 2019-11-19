@@ -1,8 +1,5 @@
-#ifndef COMMON_QUEUE_H__
-#define COMMON_QUEUE_H__
-
-#include <stdbool.h>
-#include <stddef.h>
+#ifndef COMMON_PUBLIC_QUEUE_H__
+#define COMMON_PUBLIC_QUEUE_H__
 
 #include "iterator.h"
 
@@ -44,10 +41,10 @@ void *Queue_get(const Queue *queue, size_t index);
 void *Queue_enqueue(Queue *queue, const void *data);
 
 // Removes an item from the queue and stores it in the given location.
-void Queue_dequeue(Queue *queue, const void *data_out);
+bool Queue_dequeue(Queue *queue, void *data_out);
 
 // Peeks the oldest item in the queue and stores it in the given location.
-void Queue_peek(Queue *queue, const void *data_out);
+bool Queue_peek(Queue *queue, void *data_out);
 
 // Removes all the items from the queue.
 // Remember to clean up memory first.
@@ -65,4 +62,4 @@ void Queue_get_sink(const Queue *queue, Sink *sink);
 // Gets an Indexer for this queue. Index 0 is the oldest item in the queue.
 void Queue_get_indexer(const Queue *queue, Indexer *indexer);
 
-#endif // COMMON_QUEUE_H__
+#endif // COMMON_PUBLIC_QUEUE_H__

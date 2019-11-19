@@ -1,4 +1,4 @@
 #include "stack.h"
 
 // STUB
-size_t stack_size(const Stack *list) { return 0; }
+size_t Stack_count(const Stack *stack) { return 0; }

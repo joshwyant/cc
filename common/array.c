@@ -1,10 +1,10 @@
 #include "array.h"
 
 // STUB
-void *array_get_data(const Array *array) { return NULL; }
+void *Array_get_data(const Array *array) { return NULL; }
 
 // STUB
-void array_get_indexer(const Array *array, Indexer *indexer) {}
+void Array_get_indexer(const Array *array, Indexer *indexer) {}
 
 // STUB
-size_t array_size(const Array *array) { return 0; }
+size_t Array_count(const Array *array) { return 0; }

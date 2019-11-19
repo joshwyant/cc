@@ -40,7 +40,7 @@ void *test_malloc(size_t size) {
     log.file_info = (*_cmalloc)(strlen(_malloc_reference) + 1);
     strcpy(log.file_info, _malloc_reference);
     log.num_bytes = size;
-    map_add(_malloc_log, &data, &log);
+    Map_add(_malloc_log, &data, &log);
     // printf("malloc called: %4d 0x%016llx\n", (unsigned int)size,
     //       (unsigned long long)data);
     // printf("%s\n", log.file_info);
@@ -53,7 +53,7 @@ void test_free(void *ptr) {
   (*_cfree)(ptr);
   if (!_malloc_logging) {
     _malloc_logging = true;
-    map_delete(_malloc_log, &ptr);
+    Map_delete(_malloc_log, &ptr);
     // printf("free called:        0x%016llx\n", (unsigned long long)ptr);
     _malloc_logging = false;
   }
@@ -61,7 +61,7 @@ void test_free(void *ptr) {
 
 void init_malloc_logging() {
   _malloc_logging = true;
-  _malloc_log = map_alloc(&UnsignedLongKeyInfo, sizeof(struct MemoryLog));
+  _malloc_log = Map_alloc(&UnsignedLongKeyInfo, sizeof(struct MemoryLog));
   _malloc_logging = false;
 }
 
@@ -74,9 +74,9 @@ void find_leaks_for_each(void *elem) {
 
 TEST(find_leaks) {
   Iterator iter;
-  map_get_value_iterator(_malloc_log, &iter);
+  Map_get_value_iterator(_malloc_log, &iter);
   for_each(&iter, find_leaks_for_each);
 
-  assert(map_size(_malloc_log) == 0);
+  assert(Map_count(_malloc_log) == 0);
 }
 #endif

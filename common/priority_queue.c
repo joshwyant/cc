@@ -1,4 +1,4 @@
 #include "priority_queue.h"
 
 // STUB
-size_t priority_queue_size(const PriorityQueue *list) { return 0; }
+size_t PriorityQueue_count(const PriorityQueue *queue) { return 0; }

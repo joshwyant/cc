@@ -11,172 +11,166 @@
   /* A dynamically growing list. */                                            \
   typedef struct List name##List;                                              \
   /* Creates a new name##List object. */                                       \
-  name##List *name##ListAlloc();                                               \
-  /* Initializes a pre-allocated name##List object */                          \
-  bool name##ListInit(name##List *list);                                       \
+  name##List *name##List_alloc();                                              \
   /* Gets the number of elements in the name##List */                          \
-  size_t name##ListSize(const name##List *list);                               \
+  size_t name##List_count(const name##List *list);                              \
   /* Returns whether the list is empty. */                                     \
-  bool name##ListEmpty(const name##List *list);                                \
+  bool name##List_empty(const name##List *list);                               \
   /* Gets the capacity of the name##List */                                    \
-  size_t name##ListCapacity(const name##List *list);                           \
+  size_t name##List_capacity(const name##List *list);                          \
   /* Reserves memory for a total of `num_elems' objects. Capacity always       \
    * increases by a factor of 2. Returns whether the allocation was            \
    * successful. */                                                            \
-  bool name##ListReserve(name##List *list, size_t num_elems);                  \
+  bool name##List_reserve(name##List *self, size_t num_elems);                 \
   /* Removes excess memory for the name##List object. Returns whether the      \
    * allocation was successful. */                                             \
-  bool name##ListTrim(name##List *list);                                       \
+  bool name##List_trim(name##List *list);                                      \
   /* Frees up the name##List object. */                                        \
-  void name##ListFree(name##List *list);                                       \
-  /* Cleans up the name##List object, but does not free it. */                 \
-  void name##ListCleanup(name##List *list);                                    \
+  void name##List_free(name##List *list);                                      \
   /* Gets the size of an element in the name##List */                          \
-  size_t name##ListElementSize(const name##List *list);                        \
+  size_t name##List_element_size(const name##List *list);                      \
   /* Gets the data for the list. */                                            \
-  type *name##ListGetData(const name##List *list);                             \
+  type *name##List_get_data(const name##List *list);                           \
   /* Gets the item at `index' */                                               \
-  type name##ListGet(const name##List *list, size_t index);                    \
+  type name##List_get(const name##List *self, size_t index);                   \
   /* Gets the item at `index' */                                               \
-  type *name##ListGetRef(const name##List *list, size_t index);                \
+  type *name##List_get_ref(const name##List *self, size_t index);              \
   /* Sets the item at `index' to the given data. `index' must be within the    \
    * bounds of the list. */                                                    \
-  void name##ListSet(name##List *list, size_t index, const type elem);         \
+  void name##List_set(name##List *self, size_t index, const type elem);        \
   /* Sets the item at `index' to the given data. `index' must be within the    \
    * bounds of the list. */                                                    \
-  void name##ListSetRef(name##List *list, size_t index, const type *elem);     \
+  void name##List_set_ref(name##List *self, size_t index, const type *elem);   \
   /* Sets the data at `index' to the given data. `index' and data must be      \
    * within the bounds of the list. */                                         \
-  void name##ListSetRange(name##List *list, size_t index, const type *elem,    \
-                          int count);                                          \
+  void name##List_set_range(name##List *self, size_t index, const type *elem,  \
+                            int count);                                        \
   /* Inserts the given element somewhere in the middle of the list. Returns a  \
    * pointer to the inserted data. Returns NULL if unsuccessful. */            \
-  type *name##ListInsert(name##List *list, size_t index, const type elem);     \
+  type *name##List_insert(name##List *self, size_t index, const type elem);    \
   /* Inserts the given element somewhere in the middle of the list. Returns a  \
    * pointer to the inserted data. Returns NULL if unsuccessful. */            \
-  type *name##ListInsertRef(name##List *list, size_t index, const type *elem); \
+  type *name##List_insert_ref(name##List *self, size_t index,                  \
+                              const type *elem);                               \
   /* Inserts the given elements somewhere in the middle of the list. Returns a \
    * pointer to the inserted data. Returns NULL if unsuccessful. */            \
-  type *name##ListInsertRange(name##List *list, size_t index,                  \
-                              const type *elems, size_t count);                \
+  type *name##List_insert_range(name##List *self, size_t index,                \
+                                const type *elems, size_t count);              \
   /* Appends the given element to the list. Returns a pointer to the appended  \
    * data. Returns NULL if unsuccessful. */                                    \
-  type *name##ListAppend(name##List *list, const type elem);                   \
+  type *name##List_add(name##List *self, const type elem);                     \
   /* Appends the given element to the list. Returns a pointer to the appended  \
    * data. Returns NULL if unsuccessful. */                                    \
-  type *name##ListAppendRef(name##List *list, const type *elem);               \
+  type *name##List_add_ref(name##List *self, const type *elem);                \
   /* Appends the given elements to the list. Returns a pointer to the appended \
    * data. Returns NULL if unsuccessful. */                                    \
-  type *name##ListAppendRange(name##List *list, const type *elems,             \
-                              size_t count);                                   \
+  type *name##List_add_range(name##List *self, const type *elems,              \
+                             size_t count);                                    \
   /* Removes an element from the list. */                                      \
-  void name##ListRemove(name##List *list, size_t start_index);                 \
+  void name##List_remove(name##List *self, size_t start_index);                \
   /* Removes all the items from the list. Remember to clean up memory first.   \
    */                                                                          \
-  void name##ListClear(name##List *list);                                      \
+  void name##List_clear(name##List *list);                                     \
   /* Removes a range of elements from the list. */                             \
-  void name##ListRemoveRange(name##List *list, size_t start_index,             \
-                             size_t count);                                    \
+  void name##List_remove_range(name##List *self, size_t start_index,           \
+                               size_t count);                                  \
   /* Copies a list. Returns whether successful. */                             \
-  bool name##ListCopy(name##List *dest_list, const name##List *list);          \
+  bool name##List_copy(name##List *dest_list, const name##List *list);         \
   /* Gets an Iterator for this name##List */                                   \
-  void name##ListGetIterator(const name##List *list, name##Iterator *iter);    \
+  void name##List_get_iterator(const name##List *self, name##Iterator *iter);  \
   /* Gets a reverse Iterator for this name##List */                            \
-  void name##ListGetReverseIterator(const name##List *list,                    \
-                                    name##Iterator *iter);                     \
+  void name##List_get_reverse_iterator(const name##List *self,                 \
+                                       name##Iterator *iter);                  \
   /* Gets a Sink for this list */                                              \
-  void name##ListGetSink(const name##List *list, name##Sink *sink);            \
+  void name##List_get_sink(const name##List *self, name##Sink *sink);          \
   /* Gets an Indexer for this list */                                          \
-  void name##ListGetIndexer(const name##List *list, name##Indexer *indexer);
+  void name##List_get_indexer(const name##List *self, name##Indexer *indexer);
 
 #define DEFINE_LIST(name, type)                                                \
-  name##List *name##ListAlloc() {                                              \
-    return (name##List *)list_alloc(sizeof(type));                             \
+  name##List *name##List_alloc() {                                             \
+    return (name##List *)List_alloc(sizeof(type));                             \
   }                                                                            \
-  bool name##ListInit(name##List *list) {                                      \
-    return list_init((List *)list, sizeof(type));                              \
+  size_t name##List_count(const name##List *self) {                             \
+    return List_count((const List *)self);                                      \
   }                                                                            \
-  size_t name##ListSize(const name##List *list) {                              \
-    return list_size((const List *)list);                                      \
+  bool name##List_empty(const name##List *self) {                              \
+    return List_empty((const List *)self);                                     \
   }                                                                            \
-  bool name##ListEmpty(const name##List *list) {                               \
-    return list_empty((const List *)list);                                     \
+  size_t name##List_apacity(const name##List *self) {                          \
+    return List_capacity((const List *)self);                                  \
   }                                                                            \
-  size_t name##ListCapacity(const name##List *list) {                          \
-    return list_capacity((const List *)list);                                  \
+  bool name##List_reserve(name##List *self, size_t num_elems) {                \
+    return List_reserve((List *)self, num_elems);                              \
   }                                                                            \
-  bool name##ListReserve(name##List *list, size_t num_elems) {                 \
-    return list_reserve((List *)list, num_elems);                              \
+  bool name##List_trim(name##List *self) { return List_trim((List *)self); }   \
+  void name##List_free(name##List *self) { List_free((List *)self); }          \
+  size_t name##List_element_size(const name##List *self) {                     \
+    return List_element_size((const List *)self);                              \
   }                                                                            \
-  bool name##ListTrim(name##List *list) { return list_trim((List *)list); }    \
-  void name##ListFree(name##List *list) { list_free((List *)list); }           \
-  void name##ListCleanup(name##List *list) { list_cleanup((List *)list); }     \
-  size_t name##ListElementSize(const name##List *list) {                       \
-    return list_element_size((const List *)list);                              \
+  type *name##List_get_data(const name##List *self) {                          \
+    return (type *)List_get_data((const List *)self);                          \
   }                                                                            \
-  type *name##ListGetData(const name##List *list) {                            \
-    return (type *)list_get_data((const List *)list);                          \
+  type name##List_get(const name##List *self, size_t index) {                  \
+    return *(type *)List_get((const List *)self, index);                       \
   }                                                                            \
-  type name##ListGet(const name##List *list, size_t index) {                   \
-    return *(type *)list_get((const List *)list, index);                       \
+  type *name##List_get_ref(const name##List *self, size_t index) {             \
+    return (type *)List_get((const List *)self, index);                        \
   }                                                                            \
-  type *name##ListGetRef(const name##List *list, size_t index) {               \
-    return (type *)list_get((const List *)list, index);                        \
+  void name##List_set(name##List *self, size_t index, const type elem) {       \
+    List_set((List *)self, index, &elem);                                      \
   }                                                                            \
-  void name##ListSet(name##List *list, size_t index, const type elem) {        \
-    list_set((List *)list, index, &elem);                                      \
+  void name##List_set_ref(name##List *self, size_t index, const type *elem) {  \
+    List_set((List *)self, index, elem);                                       \
   }                                                                            \
-  void name##ListSetRef(name##List *list, size_t index, const type *elem) {    \
-    list_set((List *)list, index, elem);                                       \
+  void name##List_set_range(name##List *self, size_t index, const type *elem,  \
+                            int count) {                                       \
+    List_set_range((List *)self, index, elem, count);                          \
   }                                                                            \
-  void name##ListSetRange(name##List *list, size_t index, const type *elem,    \
-                          int count) {                                         \
-    list_set_range((List *)list, index, elem, count);                          \
+  type *name##List_insert(name##List *self, size_t index, const type elem) {   \
+    return (type *)List_insert((List *)self, index, &elem);                    \
   }                                                                            \
-  type *name##ListInsert(name##List *list, size_t index, const type elem) {    \
-    return (type *)list_insert((List *)list, index, &elem);                    \
+  type *name##List_insert_ref(name##List *self, size_t index,                  \
+                              const type *elem) {                              \
+    return (type *)List_insert((List *)self, index, elem);                     \
   }                                                                            \
-  type *name##ListInsertRef(name##List *list, size_t index,                    \
-                            const type *elem) {                                \
-    return (type *)list_insert((List *)list, index, elem);                     \
+  type *name##List_insert_range(name##List *self, size_t index,                \
+                                const type *elems, size_t count) {             \
+    return (type *)List_insert_range((List *)self, index, elems, count);       \
   }                                                                            \
-  type *name##ListInsertRange(name##List *list, size_t index,                  \
-                              const type *elems, size_t count) {               \
-    return (type *)list_insert_range((List *)list, index, elems, count);       \
+  type *name##List_add(name##List *self, const type elem) {                    \
+    return (type *)List_add((List *)self, &elem);                              \
   }                                                                            \
-  type *name##ListAppend(name##List *list, const type elem) {                  \
-    return (type *)list_append((List *)list, &elem);                           \
+  type *name##List_add_ref(name##List *self, const type *elem) {               \
+    return (type *)List_add((List *)self, elem);                               \
   }                                                                            \
-  type *name##ListAppendRef(name##List *list, const type *elem) {              \
-    return (type *)list_append((List *)list, elem);                            \
-  }                                                                            \
-  type *name##ListAppendRange(name##List *list, const type *elems,             \
-                              size_t count) {                                  \
-    return (type *)list_append_range((List *)list, elems, count);              \
-  }                                                                            \
-  void name##ListRemove(name##List *list, size_t start_index) {                \
-    list_remove((List *)list, start_index);                                    \
-  }                                                                            \
-  void name##ListClear(name##List *list) { list_clear((List *)list); }         \
-  void name##ListRemoveRange(name##List *list, size_t start_index,             \
+  type *name##List_add_range(name##List *self, const type *elems,              \
                              size_t count) {                                   \
-    list_remove_range((List *)list, start_index, count);                       \
+    return (type *)List_add_range((List *)self, elems, count);                 \
   }                                                                            \
-  bool name##ListCopy(name##List *dest_list, const name##List *list) {         \
-    return list_copy((List *)dest_list, (List *)list);                         \
+  void name##List_remove(name##List *self, size_t start_index) {               \
+    List_remove((List *)self, start_index);                                    \
   }                                                                            \
-  void name##ListGetIterator(const name##List *list, name##Iterator *iter) {   \
-    list_get_iterator((const List *)list, (Iterator *)iter);                   \
+  void name##List_clear(name##List *self) { List_clear((List *)self); }        \
+  void name##List_remove_range(name##List *self, size_t start_index,           \
+                               size_t count) {                                 \
+    List_remove_range((List *)self, start_index, count);                       \
   }                                                                            \
-  void name##ListGetReverseIterator(const name##List *list,                    \
-                                    name##Iterator *iter) {                    \
-    list_get_reverse_iterator((const List *)list, (Iterator *)iter);           \
+  bool name##List_copy(name##List *dest_list, const name##List *list) {        \
+    return List_copy((List *)dest_list, (List *)list);                         \
   }                                                                            \
-  void name##ListGetSink(const name##List *list, name##Sink *sink) {           \
-    list_get_sink((const List *)list, (Sink *)sink);                           \
+  void name##List_get_iterator(const name##List *self, name##Iterator *iter) { \
+    List_get_iterator((const List *)self, (Iterator *)iter);                   \
   }                                                                            \
-  void name##ListGetIndexer(const name##List *list, name##Indexer *indexer) {  \
-    list_get_indexer((const List *)list, (Indexer *)indexer);                  \
+  void name##List_get_reverse_iterator(const name##List *self,                 \
+                                       name##Iterator *iter) {                 \
+    List_get_reverse_iterator((const List *)self, (Iterator *)iter);           \
+  }                                                                            \
+  void name##List_get_sink(const name##List *self, name##Sink *sink) {         \
+    List_get_sink((const List *)self, (Sink *)sink);                           \
+  }                                                                            \
+  void name##List_get_indexer(const name##List *self,                          \
+                              name##Indexer *indexer) {                        \
+    List_get_indexer((const List *)self, (Indexer *)indexer);                  \
   }
 
 DECLARE_LIST(Int, int);

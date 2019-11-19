@@ -88,26 +88,34 @@ void for_each(Iterator *iter, void (*action)(void *elem));
 void for_each_ext(Iterator *iter,
                   void (*action)(void *elem, const Iterator *iter));
 
-bool iter_copy(const Sink *dest, Iterator *iter);
+bool Iterator_copy(const Sink *dest, Iterator *iter);
 
-void indexer_sort(const Indexer *indexer,
+void Indexer_sort(const Indexer *indexer,
                   int (*compare_fn)(const void *a, const void *b));
 
-bool iter_sort(const Sink *dest, Iterator *iter,
-               int (*compare_fn)(const void *a, const void *b));
+bool Iterator_sort(const Sink *dest, Iterator *iter,
+                   int (*compare_fn)(const void *a, const void *b));
 
-void iter_map(const Sink *dest, Iterator *iter,
-              void (*map_fn)(void *dest, const void *elem));
+void Iterator_map(const Sink *dest, Iterator *iter,
+                  void (*map_fn)(void *dest, const void *elem));
 
-void iter_flat_map(const Sink *dest, Iterator *iter,
-                   void (*map_fn)(Sink *dest, const void *elem));
+void Iterator_flat_map(const Sink *dest, Iterator *iter,
+                       void (*map_fn)(Sink *dest, const void *elem));
 
 // TODO: sum, product, etc.
-void iter_reduce(const void *dest, Iterator *iter,
-                 void (*reduce_fn)(void *dest, const void *elem));
+void Iterator_reduce(const void *dest, Iterator *iter,
+                     void (*reduce_fn)(void *dest, const void *elem));
 
-void iter_filter(const Sink *dest, Iterator *iter,
-                 bool (*filter_fn)(const void *elem));
+void Iterator_filter(const Sink *dest, Iterator *iter,
+                     bool (*filter_fn)(const void *elem));
+
+int String_compare(const void *a, const void *b);
+
+int StringCase_compare(const void *a, const void *b);
+
+int String_hash(const void *key);
+
+int StringCase_hash(const void *key);
 
 #define DECLARE_CONTAINER_FN(name, type, hash_fn, eq_fn)                       \
   DECLARE_ITERATOR_TYPE(name, type)                                            \
@@ -116,52 +124,52 @@ void iter_filter(const Sink *dest, Iterator *iter,
   extern KeyInfo name##KeyInfo;                                                \
   int hash_fn(const void *k);                                                  \
   bool eq_fn(const void *_a, const void *_b);                                  \
-  void name##ForEach(name##Iterator *iter, void (*action)(type * elem));
+  void name##_for_each(name##Iterator *iter, void (*action)(type * elem));
 
 #define DECLARE_CONTAINER(name, type)                                          \
-  DECLARE_CONTAINER_FN(name, type, name##Hash, name##Eq)
+  DECLARE_CONTAINER_FN(name, type, name##_hash, name##_eq)
 
 #define DEFINE_CONTAINER_FN(name, type, hash_fn, eq_fn)                        \
   KeyInfo name##KeyInfo = {sizeof(type), hash_fn, eq_fn};                      \
-  void name##ForEach(name##Iterator *iter, void (*action)(type * elem)) {      \
+  void name##_for_each(name##Iterator *iter, void (*action)(type * elem)) {    \
     for_each((Iterator *)iter, (void (*)(void *))action);                      \
   }
 
 #define DEFINE_CONTAINER(name, type, hash_expr, eq_expr)                       \
-  int name##Hash(const void *k) {                                              \
+  int name##_hash(const void *k) {                                             \
     type key = *(const type *)k;                                               \
     return (hash_expr);                                                        \
   }                                                                            \
-  bool name##Eq(const void *_a, const void *_b) {                              \
+  bool name##_eq(const void *_a, const void *_b) {                             \
     type a = *(const type *)_a;                                                \
     type b = *(const type *)_b;                                                \
     return (eq_expr);                                                          \
   }                                                                            \
-  DEFINE_CONTAINER_FN(name, type, name##Hash, name##Eq)
+  DEFINE_CONTAINER_FN(name, type, name##_hash, name##_eq)
 
 #define DECLARE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)       \
-  DECLARE_CONTAINER_FN(name, type, hash_fn, name##Eq)                          \
+  DECLARE_CONTAINER_FN(name, type, hash_fn, name##_eq)                         \
   extern RelationalKeyInfo name##RelationalKeyInfo;                            \
   int compare_fn(const void *a, const void *b);
 
 #define DECLARE_RELATIONAL_CONTAINER(name, type)                               \
-  DECLARE_RELATIONAL_CONTAINER_FN(name, type, name##Hash, name##Compare)
+  DECLARE_RELATIONAL_CONTAINER_FN(name, type, name##_hash, name##_compare)
 
 #define DEFINE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)        \
-  bool name##Eq(const void *a, const void *b) {                                \
-    return name##Compare(a, b) == 0;                                           \
+  bool name##_eq(const void *a, const void *b) {                               \
+    return name##_compare(a, b) == 0;                                          \
   }                                                                            \
-  DEFINE_CONTAINER_FN(name, type, hash_fn, name##Eq)                           \
+  DEFINE_CONTAINER_FN(name, type, hash_fn, name##_eq)                          \
   RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, compare_fn};
 
 #define DEFINE_RELATIONAL_CONTAINER(name, type, hash_expr, compare_expr)       \
-  int name##Compare(const void *_a, const void *_b) {                          \
+  int name##_compare(const void *_a, const void *_b) {                         \
     type a = *(const type *)_a;                                                \
     type b = *(const type *)_b;                                                \
     return (compare_expr);                                                     \
   }                                                                            \
-  DEFINE_CONTAINER(name, type, hash_expr, (name##Compare(_a, _b) == 0))        \
-  RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, name##Compare};
+  DEFINE_CONTAINER(name, type, hash_expr, (name##_compare(_a, _b) == 0))       \
+  RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, name##_compare};
 
 #define DEFINE_RELATIONAL_CONTAINER_BASIC(name, type)                          \
   DEFINE_RELATIONAL_CONTAINER(name, type, key * 7, a - b)

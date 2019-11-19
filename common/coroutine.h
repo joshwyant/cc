@@ -18,9 +18,7 @@
 
 #define YIELD(x)                                                               \
   do {                                                                         \
-    state = __LINE__;                                                          \
-    return x;                                                                  \
-  case __LINE__:;                                                              \
+    state = __LINE__; return x; case __LINE__:;                                \
   } while (0)
 
 #define ITERATOR_END } // TODO: return EOF here

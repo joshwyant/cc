@@ -1,4 +1,4 @@
 #include "back_list.h"
 
 // STUB
-size_t back_list_size(const BackList *list) { return 0; }
+size_t BackList_count(const BackList *list) { return 0; }

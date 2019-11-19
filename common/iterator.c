@@ -40,42 +40,42 @@ void sink_ensure_size_(const Sink *sink, size_t num_elems) {
   ASSERT(num_elems >= 0);
 
   if (sink->collection_type == COLLECTION_LIST) {
-    list_reserve((List *)sink->collection, num_elems);
+    List_reserve((List *)sink->collection, num_elems);
   }
 }
 
-void sink_ensure_iter_size_(const Sink *dest, Iterator *source) {
+void sink_ensure_iterator_size_(const Sink *dest, Iterator *source) {
   ASSERT(dest != NULL);
   ASSERT(source != NULL);
 
   size_t size = 0;
   switch (source->collection_type) {
   case COLLECTION_ARRAY:
-    size = array_size((Array *)source->collection);
+    size = Array_count((Array *)source->collection);
     break;
   case COLLECTION_LIST:
-    size = list_size((List *)source->collection);
+    size = List_count((List *)source->collection);
     break;
   case COLLECTION_LINKED_LIST:
-    size = linked_list_size((LinkedList *)source->collection);
+    size = LinkedList_count((LinkedList *)source->collection);
     break;
   case COLLECTION_BACK_LIST:
-    size = back_list_size((BackList *)source->collection);
+    size = BackList_count((BackList *)source->collection);
     break;
   case COLLECTION_STACK:
-    size = stack_size((Stack *)source->collection);
+    size = Stack_count((Stack *)source->collection);
     break;
   case COLLECTION_QUEUE:
-    size = queue_size((Queue *)source->collection);
+    size = Queue_count((Queue *)source->collection);
     break;
   case COLLECTION_PRIORITY_QUEUE:
-    size = priority_queue_size((PriorityQueue *)source->collection);
+    size = PriorityQueue_count((PriorityQueue *)source->collection);
     break;
   case COLLECTION_SET:
-    size = set_size((Set *)source->collection);
+    size = Set_count((Set *)source->collection);
     break;
   case COLLECTION_MAP:
-    size = map_size((Map *)source->collection);
+    size = Map_count((Map *)source->collection);
     break;
   default:
     return;
@@ -85,11 +85,11 @@ void sink_ensure_iter_size_(const Sink *dest, Iterator *source) {
   }
 }
 
-bool iter_copy(const Sink *dest, Iterator *iter) {
+bool Iterator_copy(const Sink *dest, Iterator *iter) {
   ASSERT(dest != NULL);
   ASSERT(iter != NULL);
 
-  sink_ensure_iter_size_(dest, iter);
+  sink_ensure_iterator_size_(dest, iter);
   while (iter->move_next(iter)) {
     void *added = dest->add(dest, iter->current(iter));
     if (!added) {
@@ -105,10 +105,10 @@ void indexer_sort(const Indexer *indexer,
   void *data = NULL;
   switch (indexer->collection_type) {
   case COLLECTION_LIST:
-    data = list_get_data((List *)indexer->collection);
+    data = List_get_data((List *)indexer->collection);
     break;
   case COLLECTION_ARRAY:
-    data = array_get_data((Array *)indexer->collection);
+    data = Array_get_data((Array *)indexer->collection);
     break;
   default:
     return; // not supported
@@ -118,7 +118,7 @@ void indexer_sort(const Indexer *indexer,
   }
 }
 
-bool iter_sort(const Sink *dest, Iterator *iter,
+bool Iterator_sort(const Sink *dest, Iterator *iter,
                int (*compare_fn)(const void *a, const void *b)) {
   Indexer indexer;
   Sink interm_sink;
@@ -129,53 +129,53 @@ bool iter_sort(const Sink *dest, Iterator *iter,
     // Write directly to the collection instead of using a temporary list
     if (dest->collection_type == COLLECTION_LIST) {
       List *dest_list = dest->collection;
-      list_clear(dest_list);
-      list_get_indexer(dest_list, &indexer);
+      List_clear(dest_list);
+      List_get_indexer(dest_list, &indexer);
     } else {
       Array *dest_array = dest->collection;
-      array_get_indexer(dest_array, &indexer);
+      Array_get_indexer(dest_array, &indexer);
     }
     interm_dest = dest;
   } else {
     // Use a temporary list
-    temp_list = list_alloc(iter->elem_size);
+    temp_list = List_alloc(iter->elem_size);
     if (!temp_list) {
       return false;
     }
-    list_get_indexer(temp_list, &indexer);
-    list_get_iterator(temp_list, &list_iter);
-    list_get_sink(temp_list, &interm_sink);
+    List_get_indexer(temp_list, &indexer);
+    List_get_iterator(temp_list, &list_iter);
+    List_get_sink(temp_list, &interm_sink);
     interm_dest = &interm_sink;
   }
   // Copy the source and sort
-  iter_copy(interm_dest, iter);
+  Iterator_copy(interm_dest, iter);
   indexer_sort(&indexer, compare_fn);
   // Copy and free any temporary list.
   if (temp_list) {
-    iter_copy(dest, &list_iter);
-    list_free(temp_list);
+    Iterator_copy(dest, &list_iter);
+    List_free(temp_list);
   }
   return true;
 }
 
-void iter_map(const Sink *dest, Iterator *iter,
+void Iterator_map(const Sink *dest, Iterator *iter,
               void (*map_fn)(void *dest, const void *elem)) {}
 
-void iter_flat_map(const Sink *dest, Iterator *iter,
+void Iterator_flat_map(const Sink *dest, Iterator *iter,
                    void (*map_fn)(Sink *dest, const void *elem)) {}
 
-void iter_filter(const Sink *dest, Iterator *iter,
+void Iterator_filter(const Sink *dest, Iterator *iter,
                  bool (*filter_fn)(const void *elem)) {}
 
-int StringCompare(const void *a, const void *b) {
+int String_compare(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
 }
 
-int StringCaseCompare(const void *a, const void *b) {
+int StringCase_compare(const void *a, const void *b) {
   return strcasecmp((char *)a, (char *)b);
 }
 
-int StringHash(const void *key) {
+int String_hash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * *c;
@@ -183,7 +183,7 @@ int StringHash(const void *key) {
   return hash;
 }
 
-int StringCaseHash(const void *key) {
+int StringCase_hash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * toupper(*c);
@@ -207,7 +207,7 @@ DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedLong, unsigned long)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedChar, unsigned char)
 
-DEFINE_RELATIONAL_CONTAINER_FN(String, char *, StringHash, StringCompare)
+DEFINE_RELATIONAL_CONTAINER_FN(String, char *, String_hash, String_compare)
 
-DEFINE_RELATIONAL_CONTAINER_FN(StringCase, char *, StringCaseHash,
-                               StringCompare)
+DEFINE_RELATIONAL_CONTAINER_FN(StringCase, char *, StringCase_hash,
+                               String_compare)

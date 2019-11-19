@@ -10,75 +10,69 @@
 typedef struct Set Set;
 
 // Creates a new Set object.
-Set *set_alloc(KeyInfo *key_info);
-
-// Initializes a pre-allocated Set object
-bool set_init(Set *set, KeyInfo *key_info);
+Set *Set_alloc(KeyInfo *key_info);
 
 // Gets the number of elements in the Set
-size_t set_size(const Set *set);
+size_t Set_count(const Set *set);
 
 // Returns whether the set is empty
-bool set_empty(const Set *set);
+bool Set_empty(const Set *set);
 
 // Frees up the Set object.
-void set_free(Set *set);
-
-// Cleans up the Set object, but does not free it.
-void set_cleanup(Set *set);
+void Set_free(Set *set);
 
 // Gets the size of an element in the Set
-size_t set_element_size(const Set *set);
+size_t Set_element_size(const Set *set);
 
 // Gets the key info for the Set
-const KeyInfo *set_key_info(const Set *set);
+const KeyInfo *Set_key_info(const Set *set);
 
 // Copies the value to the set and returns pointer to the new value.
 // Returns NULL if unsuccessful.
-void *set_add(Set *set, const void *data);
+void *Set_add(Set *set, const void *data);
 
 // Looks up the value in set and stores the data in the given location.
 // Returns whether successful.
-bool set_get(Set *set, const void *key, void *data_out);
+bool Set_get(Set *set, const void *key, void *data_out);
 
 // Checks whether the given key exists in the set.
-bool set_exists(const Set *set, const void *key);
+bool Set_exists(const Set *set, const void *key);
 
 // Removes an item from the set.
-void set_delete(Set *set, const void *key);
+void Set_delete(Set *set, const void *key);
 
 // Removes all the items from the set.
 // Remember to clean up memory first.
-void set_clear(Set *set);
+void Set_clear(Set *set);
 
 // Copies a set. Returns whether successful.
-bool set_copy(Set *dest_set, const Set *set);
+bool Set_copy(Set *dest_set, const Set *set);
 
 // Creates the union of two sets.
-bool set_union(Set *dest_set, const Set *a, const Set *b);
+bool Set_union(Set *dest_set, const Set *a, const Set *b);
 
 // Creates the intersection of two sets.
-bool set_intersection(Set *dest_set, const Set *a, const Set *b);
+bool Set_intersection(Set *dest_set, const Set *a, const Set *b);
 
 // Creates the difference of two sets.
-bool set_difference(Set *dest_set, const Set *a, const Set *b);
+bool Set_difference(Set *dest_set, const Set *a, const Set *b);
 
 // Creates the symmetric difference of two sets.
-bool set_symmetric_difference(Set *dest_set, const Set *a, const Set *b);
+bool Set_symmetric_difference(Set *dest_set, const Set *a, const Set *b);
 
 // Stores the union of two sets into the first set.
-bool set_union_with(Set *dest_set, const Set *set);
+bool Set_union_with(Set *dest_set, const Set *set);
 
 // Stores the intersection of two sets into the first set.
-bool set_intersect_with(Set *dest_set, const Set *set);
+bool Set_intersect_with(Set *dest_set, const Set *set);
 
 // Stores the difference of two sets into the first set.
-bool set_difference_with(Set *dest_set, const Set *set);
+bool Set_difference_with(Set *dest_set, const Set *set);
 
 // Stores the symmetric difference of two sets into the first set.
-bool set_symmetric_difference_with(Set *dest_set, const Set *set);
+bool Set_symmetric_difference_with(Set *dest_set, const Set *set);
 
 // Gets an Iterator for this Set in an undefined order.
-void set_get_iterator(const Set *set, Iterator *iter);
+void Set_get_iterator(const Set *set, Iterator *iter);
 
 #endif // COMMON_SET_H__

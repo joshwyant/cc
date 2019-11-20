@@ -110,4 +110,139 @@ void LinkedList_get_sink(const LinkedList *list, Sink *sink);
 // Gets a reverse Sink for this list
 void LinkedList_get_reverse_sink(const LinkedList *list, Sink *sink);
 
+#define DECLARE_LINKED_LIST(name, T)                                           \
+  typedef struct LinkedList name##LinkedList;                                  \
+  typedef struct LinkedListNode name##LinkedListNode;                          \
+  name##LinkedList *name##LinkedList_alloc();                                  \
+  T name##LinkedList_get_first(const name##LinkedList *list);                  \
+  T name##LinkedList_get_last(const name##LinkedList *list);                   \
+  T *name##LinkedList_get_first_ref(const name##LinkedList *list);             \
+  T *name##LinkedList_get_last_ref(const name##LinkedList *list);              \
+  name##LinkedListNode *name##LinkedList_get_first_node(                       \
+      const name##LinkedList *list);                                           \
+  name##LinkedListNode *name##LinkedList_get_last_node(                        \
+      const name##LinkedList *list);                                           \
+  name##LinkedListNode *name##LinkedList_get_next_node(                        \
+      const name##LinkedListNode *node);                                       \
+  void name##LinkedList_set(const name##LinkedList *list,                      \
+                            name##LinkedListNode *node, const T data);         \
+  const T name##LinkedList_get(const name##LinkedListNode *node);              \
+  void name##LinkedList_set_ref(const name##LinkedList *list,                  \
+                                name##LinkedListNode *node, const T *data);    \
+  const T *name##LinkedList_get_ref(const name##LinkedListNode *node);         \
+  name##LinkedListNode *name##LinkedList_insert_before(                        \
+      name##LinkedList *list, name##LinkedListNode *node, const T *elem);      \
+  name##LinkedListNode *name##LinkedList_insert_after(                         \
+      name##LinkedList *list, name##LinkedListNode *node, const T *elem);      \
+  name##LinkedListNode *name##LinkedList_append(name##LinkedList *list,        \
+                                                const T *elem);                \
+  name##LinkedListNode *name##LinkedList_prepend(name##LinkedList *list,       \
+                                                 const T *elem);               \
+  void name##LinkedList_remove(name##LinkedList *list,                         \
+                               name##LinkedListNode *node);                    \
+  void name##LinkedList_get_iterator(const name##LinkedList *list,             \
+                                     name##Iterator *iter);                    \
+  void name##LinkedList_get_node_iterator(const name##LinkedList *list,        \
+                                          name##Iterator *iter);               \
+  void name##LinkedList_get_sink(const name##LinkedList *list,                 \
+                                 name##Sink *sink);                            \
+  void name##LinkedList_get_reverse_sink(const name##LinkedList *list,         \
+                                         name##Sink *sink);
+
+#define DEFINE_LINKED_LIST(name, T)                                            \
+  name##LinkedList *name##LinkedList_alloc() {                                 \
+    return (name##LinkedList *)LinkedList_alloc(sizeof(LinkedList));           \
+  }                                                                            \
+  T name##LinkedList_get_first(const name##LinkedList *list) {                 \
+    return *name##LinkedList_get_first_ref(list);                              \
+  }                                                                            \
+  T name##LinkedList_get_last(const name##LinkedList *list) {                  \
+    return *name##LinkedList_get_last_ref(list);                               \
+  }                                                                            \
+  T *name##LinkedList_get_first_ref(const name##LinkedList *list) {            \
+    return (T *)LinkedList_get_first((const LinkedList *)list);                \
+  }                                                                            \
+  T *name##LinkedList_get_last_ref(const name##LinkedList *list) {             \
+    return (T *)LinkedList_get_last((const LinkedList *)list);                 \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_get_first_node(                       \
+      const name##LinkedList *list) {                                          \
+    return (name##LinkedListNode *)LinkedList_get_first_node(                  \
+        (const LinkedList *)list);                                             \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_get_last_node(                        \
+      const name##LinkedList *list) {                                          \
+    return (name##LinkedListNode *)LinkedList_get_last_node(                   \
+        (const LinkedList *)list);                                             \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_get_next_node(                        \
+      const name##LinkedListNode *node) {                                      \
+    return (name##LinkedListNode *)LinkedList_get_next_node(                   \
+        (const LinkedListNode *)node);                                         \
+  }                                                                            \
+  void name##LinkedList_set(const name##LinkedList *list,                      \
+                            name##LinkedListNode *node, const T data) {        \
+    name##LinkedList_set_ref(list, node, &data);                               \
+  }                                                                            \
+  const T name##LinkedList_get(const name##LinkedListNode *node) {             \
+    return *name##LinkedList_get_ref(node);                                    \
+  }                                                                            \
+  void name##LinkedList_set_ref(const name##LinkedList *list,                  \
+                                name##LinkedListNode *node, const T *data) {   \
+    LinkedList_set((const LinkedList *)list, (LinkedListNode *)node, data);    \
+  }                                                                            \
+  const T *name##LinkedList_get_ref(const name##LinkedListNode *node) {        \
+    return (const T *)LinkedList_get((const LinkedListNode *)node);            \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_insert_before(                        \
+      name##LinkedList *list, name##LinkedListNode *node, const T *elem) {     \
+    return (name##LinkedListNode *)LinkedList_insert_before(                   \
+        (LinkedList *)list, (LinkedListNode *)node, elem);                     \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_insert_after(                         \
+      name##LinkedList *list, name##LinkedListNode *node, const T *elem) {     \
+    return (name##LinkedListNode *)LinkedList_insert_after(                    \
+        (LinkedList *)list, (LinkedListNode *)node, elem);                     \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_append(name##LinkedList *list,        \
+                                                const T *elem) {               \
+    return (name##LinkedListNode *)LinkedList_append((LinkedList *)list,       \
+                                                     elem);                    \
+  }                                                                            \
+  name##LinkedListNode *name##LinkedList_prepend(name##LinkedList *list,       \
+                                                 const T *elem) {              \
+    return (name##LinkedListNode *)LinkedList_prepend((LinkedList *)list,      \
+                                                      elem);                   \
+  }                                                                            \
+  void name##LinkedList_remove(name##LinkedList *list,                         \
+                               name##LinkedListNode *node) {                   \
+    LinkedList_remove((LinkedList *)list, (LinkedListNode *)node);             \
+  }                                                                            \
+  void name##LinkedList_get_iterator(const name##LinkedList *list,             \
+                                     name##Iterator *iter) {                   \
+    LinkedList_get_iterator((const LinkedList *)list, (Iterator *)iter);       \
+  }                                                                            \
+  void name##LinkedList_get_node_iterator(const name##LinkedList *list,        \
+                                          name##Iterator *iter) {              \
+    LinkedList_get_node_iterator((const LinkedList *)list, (Iterator *)iter);  \
+  }                                                                            \
+  void name##LinkedList_get_sink(const name##LinkedList *list,                 \
+                                 name##Sink *sink) {                           \
+    LinkedList_get_sink((const LinkedList *)list, (Sink *)sink);               \
+  }                                                                            \
+  void name##LinkedList_get_reverse_sink(const name##LinkedList *list,         \
+                                         name##Sink *sink) {                   \
+    LinkedList_get_reverse_sink((const LinkedList *)list, (Sink *)sink);       \
+  }
+
+DECLARE_LINKED_LIST(Int, int)
+DECLARE_LINKED_LIST(Long, long)
+DECLARE_LINKED_LIST(Char, char)
+DECLARE_LINKED_LIST(Float, float)
+DECLARE_LINKED_LIST(Double, double)
+DECLARE_LINKED_LIST(UnsignedInt, unsigned int)
+DECLARE_LINKED_LIST(UnsignedLong, unsigned long)
+DECLARE_LINKED_LIST(UnsignedChar, unsigned char)
+DECLARE_LINKED_LIST(String, char *)
+
 #endif // COMMON_PUBLIC_LINKED_LIST_H__

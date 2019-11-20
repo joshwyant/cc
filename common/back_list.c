@@ -9,6 +9,16 @@
 
 // TODO: version
 
+DEFINE_BACK_LIST(Int, int)
+DEFINE_BACK_LIST(Long, long)
+DEFINE_BACK_LIST(Char, char)
+DEFINE_BACK_LIST(Float, float)
+DEFINE_BACK_LIST(Double, double)
+DEFINE_BACK_LIST(UnsignedInt, unsigned int)
+DEFINE_BACK_LIST(UnsignedLong, unsigned long)
+DEFINE_BACK_LIST(UnsignedChar, unsigned char)
+DEFINE_BACK_LIST(String, char *)
+
 bool BackList_init(BackList *list, size_t elem_size)
 {
     ASSERT(list);

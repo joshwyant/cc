@@ -9,6 +9,16 @@
 
 // TODO: version
 
+DEFINE_LINKED_LIST(Int, int)
+DEFINE_LINKED_LIST(Long, long)
+DEFINE_LINKED_LIST(Char, char)
+DEFINE_LINKED_LIST(Float, float)
+DEFINE_LINKED_LIST(Double, double)
+DEFINE_LINKED_LIST(UnsignedInt, unsigned int)
+DEFINE_LINKED_LIST(UnsignedLong, unsigned long)
+DEFINE_LINKED_LIST(UnsignedChar, unsigned char)
+DEFINE_LINKED_LIST(String, char *)
+
 bool LinkedList_init(LinkedList *list, size_t elem_size)
 {
     ASSERT(list);

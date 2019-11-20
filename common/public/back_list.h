@@ -116,4 +116,154 @@ void BackList_get_sink(const BackList *list, Sink *sink);
 // Gets a reverse Sink for this list
 void BackList_get_reverse_sink(const BackList *list, Sink *sink);
 
+
+#define DECLARE_BACK_LIST(name, T)                                             \
+  typedef struct BackList name##BackList;                                      \
+  typedef struct BackListNode name##BackListNode;                                      \
+  name##BackList *name##BackList_alloc();                                      \
+  T name##BackList_get_first(const name##BackList *list);                     \
+  T name##BackList_get_last(const name##BackList *list);                      \
+  T *name##BackList_get_first_ref(const name##BackList *list);                     \
+  T *name##BackList_get_last_ref(const name##BackList *list);                      \
+  name##BackListNode *name##BackList_get_first_node(                           \
+      const name##BackList *list);                                             \
+  name##BackListNode *name##BackList_get_last_node(                            \
+      const name##BackList *list);                                             \
+  name##BackListNode *name##BackList_get_next_node(                            \
+      const name##BackListNode *node);                                         \
+  name##BackListNode *name##BackList_get_previous_node(                        \
+      const name##BackListNode *node);                                         \
+  void name##BackList_set(const name##BackList *list,                          \
+                          name##BackListNode *node, const T data);             \
+  const T name##BackList_get(const name##BackListNode *node);                  \
+  void name##BackList_set_ref(const name##BackList *list,                      \
+                              name##BackListNode *node, const T *data);        \
+  const T *name##BackList_get_ref(const name##BackListNode *node);             \
+  name##BackListNode *name##BackList_insert_before(                            \
+      name##BackList *list, name##BackListNode *node, const T *elem);          \
+  name##BackListNode *name##BackList_insert_after(                             \
+      name##BackList *list, name##BackListNode *node, const T *elem);          \
+  name##BackListNode *name##BackList_append(name##BackList *list,              \
+                                            const T *elem);                    \
+  name##BackListNode *name##BackList_prepend(name##BackList *list,             \
+                                             const T *elem);                   \
+  void name##BackList_remove(name##BackList *list, name##BackListNode *node);  \
+  void name##BackList_get_iterator(const name##BackList *list,                 \
+                                   name##Iterator *iter);                      \
+  void name##BackList_get_reverse_iterator(const name##BackList *list,         \
+                                           name##Iterator *iter);              \
+  void name##BackList_get_node_iterator(const name##BackList *list,            \
+                                        name##Iterator *iter);                 \
+  void name##BackList_get_node_reverse_iterator(const name##BackList *list,    \
+                                                name##Iterator *iter);         \
+  void name##BackList_get_sink(const name##BackList *list, name##Sink *sink);  \
+  void name##BackList_get_reverse_sink(const name##BackList *list,             \
+                                       name##Sink *sink);
+
+#define DEFINE_BACK_LIST(name, T)                                              \
+  name##BackList *name##BackList_alloc() {                                     \
+    return (name##BackList *)BackList_alloc(sizeof(BackList));                 \
+  }                                                                            \
+  T name##BackList_get_first(const name##BackList *list) {                     \
+    return *name##BackList_get_first_ref(list);                                \
+  }                                                                            \
+  T name##BackList_get_last(const name##BackList *list) {                      \
+    return *name##BackList_get_last_ref(list);                                 \
+  }                                                                            \
+  T *name##BackList_get_first_ref(const name##BackList *list) {                \
+    return (T *)BackList_get_first((const BackList *)list);                    \
+  }                                                                            \
+  T *name##BackList_get_last_ref(const name##BackList *list) {                 \
+    return (T *)BackList_get_last((const BackList *)list);                     \
+  }                                                                            \
+  name##BackListNode *name##BackList_get_first_node(                           \
+      const name##BackList *list) {                                            \
+    return (name##BackListNode *)BackList_get_first_node(                      \
+        (const BackList *)list);                                               \
+  }                                                                            \
+  name##BackListNode *name##BackList_get_last_node(                            \
+      const name##BackList *list) {                                            \
+    return (name##BackListNode *)BackList_get_last_node(                       \
+        (const BackList *)list);                                               \
+  }                                                                            \
+  name##BackListNode *name##BackList_get_next_node(                            \
+      const name##BackListNode *node) {                                        \
+    return (name##BackListNode *)BackList_get_next_node(                       \
+        (const BackListNode *)node);                                           \
+  }                                                                            \
+  name##BackListNode *name##BackList_get_previous_node(                        \
+      const name##BackListNode *node) {                                        \
+    return (name##BackListNode *)BackList_get_previous_node(                   \
+        (const BackListNode *)node);                                           \
+  }                                                                            \
+  void name##BackList_set(const name##BackList *list,                          \
+                          name##BackListNode *node, const T data) {            \
+    name##BackList_set_ref(list, node, &data);                                 \
+  }                                                                            \
+  const T name##BackList_get(const name##BackListNode *node) {                 \
+    return *name##BackList_get_ref(node);                                      \
+  }                                                                            \
+  void name##BackList_set_ref(const name##BackList *list,                      \
+                              name##BackListNode *node, const T *data) {       \
+    BackList_set((const BackList *)list, (BackListNode *)node, data);          \
+  }                                                                            \
+  const T *name##BackList_get_ref(const name##BackListNode *node) {            \
+    return (const T *)BackList_get((const BackListNode *)node);                \
+  }                                                                            \
+  name##BackListNode *name##BackList_insert_before(                            \
+      name##BackList *list, name##BackListNode *node, const T *elem) {         \
+    return (name##BackListNode *)BackList_insert_before(                       \
+        (BackList *)list, (BackListNode *)node, elem);                         \
+  }                                                                            \
+  name##BackListNode *name##BackList_insert_after(                             \
+      name##BackList *list, name##BackListNode *node, const T *elem) {         \
+    return (name##BackListNode *)BackList_insert_after(                        \
+        (BackList *)list, (BackListNode *)node, elem);                         \
+  }                                                                            \
+  name##BackListNode *name##BackList_append(name##BackList *list,              \
+                                            const T *elem) {                   \
+    return (name##BackListNode *)BackList_append((BackList *)list, elem);      \
+  }                                                                            \
+  name##BackListNode *name##BackList_prepend(name##BackList *list,             \
+                                             const T *elem) {                  \
+    return (name##BackListNode *)BackList_prepend((BackList *)list, elem);     \
+  }                                                                            \
+  void name##BackList_remove(name##BackList *list, name##BackListNode *node) { \
+    BackList_remove((BackList *)list, (BackListNode *)node);                   \
+  }                                                                            \
+  void name##BackList_get_iterator(const name##BackList *list,                 \
+                                   name##Iterator *iter) {                     \
+    BackList_get_iterator((const BackList *)list, (Iterator *)iter);           \
+  }                                                                            \
+  void name##BackList_get_reverse_iterator(const name##BackList *list,         \
+                                           name##Iterator *iter) {             \
+    BackList_get_reverse_iterator((const BackList *)list, (Iterator *)iter);   \
+  }                                                                            \
+  void name##BackList_get_node_iterator(const name##BackList *list,            \
+                                        name##Iterator *iter) {                \
+    BackList_get_node_iterator((const BackList *)list, (Iterator *)iter);      \
+  }                                                                            \
+  void name##BackList_get_node_reverse_iterator(const name##BackList *list,    \
+                                                name##Iterator *iter) {        \
+    BackList_get_node_reverse_iterator((const BackList *)list,                 \
+                                       (Iterator *)iter);                      \
+  }                                                                            \
+  void name##BackList_get_sink(const name##BackList *list, name##Sink *sink) { \
+    BackList_get_sink((const BackList *)list, (Sink *)sink);                   \
+  }                                                                            \
+  void name##BackList_get_reverse_sink(const name##BackList *list,             \
+                                       name##Sink *sink) {                     \
+    BackList_get_reverse_sink((const BackList *)list, (Sink *)sink);           \
+  }
+
+DECLARE_BACK_LIST(Int, int)
+DECLARE_BACK_LIST(Long, long)
+DECLARE_BACK_LIST(Char, char)
+DECLARE_BACK_LIST(Float, float)
+DECLARE_BACK_LIST(Double, double)
+DECLARE_BACK_LIST(UnsignedInt, unsigned int)
+DECLARE_BACK_LIST(UnsignedLong, unsigned long)
+DECLARE_BACK_LIST(UnsignedChar, unsigned char)
+DECLARE_BACK_LIST(String, char *)
+
 #endif // COMMON_PUBLIC_BACK_LIST_H__

@@ -84,4 +84,32 @@ void Map_get_key_iterator(const Map *map, Iterator *iter);
 // Gets a value Iterator for this Map in an undefined order.
 void Map_get_value_iterator(const Map *map, Iterator *iter);
 
+#define DECLARE_MAP(name, Key_T, Value_T) \
+typedef struct Map name##Map;\
+typedef struct KeyValuePair name##KeyValuePair;\
+extern KeyInfo name##key_info;\
+name##Map *name##Map_alloc();\
+const name##KeyValuePair name##Map_add(name##Map *map, const Key_T key, const Value_T data);\
+const name##KeyValuePair name##Map_add_ref(name##Map *map, const Key_T *key, const Value_T *data);\
+const name##KeyValuePair name##Map_find(const name##Map *map, const Key_T key);\
+const name##KeyValuePair name##Map_find_ref(const name##Map *map, const Key_T key);\
+Value_T name##Map_get(const name##Map *map, const Key_T key);\
+bool name##Map_get_ref(const name##Map *map, const Key_T *key, Value_T *data_out);\
+bool name##Map_exists(const name##Map *map, const Key_T key);\
+bool name##Map_exists_ref(const name##Map *map, const Key_T *key);\
+void name##Map_delete(name##Map *map, const Key_T key);\
+void name##Map_delete_ref(name##Map *map, const Key_T *key);\
+bool name##Map_copy(name##Map *dest_map, const name##Map *map);\
+bool name##Map_union(name##Map *dest_map, const name##Map *a, const name##Map *b);\
+bool name##Map_intersection(name##Map *dest_map, const name##Map *a, const name##Map *b);\
+bool name##Map_difference(name##Map *dest_map, const name##Map *a, const name##Map *b);\
+bool name##Map_symmetric_difference(name##Map *dest_map, const name##Map *a, const name##Map *b);\
+bool name##Map_union_with(name##Map *dest_map, const name##Map *map);\
+bool name##Map_intersect_with(name##Map *dest_map, const name##Map *map);\
+bool name##Map_difference_with(name##Map *dest_map, const name##Map *map);\
+bool name##Map_symmetric_difference_with(name##Map *dest_map, const name##Map *map);\
+void name##Map_get_iterator(const name##Map *map, name##Iterator *iter);\
+void name##Map_get_key_iterator(const name##Map *map, name##Iterator *iter);\
+void name##Map_get_value_iterator(const name##Map *map, name##Iterator *iter);
+
 #endif // COMMON_PUBLIC_MAP_H__

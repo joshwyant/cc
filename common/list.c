@@ -11,21 +11,13 @@ bool List_init(List *list, size_t elem_size);
 void List_cleanup(List *list);
 
 DEFINE_LIST(Int, int);
-
 DEFINE_LIST(Long, long);
-
 DEFINE_LIST(Char, char);
-
 DEFINE_LIST(Float, float);
-
 DEFINE_LIST(Double, double);
-
 DEFINE_LIST(UnsignedInt, unsigned int);
-
 DEFINE_LIST(UnsignedLong, unsigned long);
-
 DEFINE_LIST(UnsignedChar, unsigned char);
-
 DEFINE_LIST(String, char *);
 
 List *List_alloc(size_t elem_size) 

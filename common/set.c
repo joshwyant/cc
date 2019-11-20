@@ -1,4 +1,4 @@
-#include "public/set.h"
+#include "protected/set.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -10,18 +10,6 @@
 
 // TODO:
 // - Version
-
-struct Set {
-  List *buckets;
-  KeyInfo key_info;
-  size_t capacity;
-  size_t count;
-  int version;
-};
-
-struct SetBucket {
-  List *items; // Holds void* items to allocated copies
-};
 
 bool Set_init(Set *set, KeyInfo *key_info);
 

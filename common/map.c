@@ -1,4 +1,4 @@
-#include "public/map.h"
+#include "protected/map.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -10,19 +10,6 @@
 
 // TODO:
 // - Version
-
-struct Map {
-  List *buckets;
-  KeyInfo key_info;
-  size_t elem_size;
-  size_t capacity;
-  size_t count;
-  int version;
-};
-
-struct MapBucket {
-  List *key_value_pairs;
-};
 
 bool Map_init(Map *map, KeyInfo *key_info, size_t elem_size);
 

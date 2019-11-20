@@ -48,10 +48,10 @@ void *Stack_push(Stack *stack, const void *data);
 
 // Removes an item from the end of the stack and stores it in the given
 // location.
-void Stack_pop(Stack *stack, const void *data_out);
+bool Stack_pop(Stack *stack, void *data_out);
 
 // Peeks the item on the end of the stack and stores it in the given location.
-void Stack_peek(const Stack *stack, const void *data_out);
+bool Stack_peek(const Stack *stack, void *data_out);
 
 // Removes all the items from the stack.
 // Remember to clean up memory first.

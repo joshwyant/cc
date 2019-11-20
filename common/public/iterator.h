@@ -48,6 +48,7 @@ DECLARE_ITERATOR_TYPE(, void)
     void *collection;                                                          \
     size_t elem_size;                                                          \
     type *(*add)(const name##Sink *sink, const type *elem);                    \
+    void *state;                                                               \
   };
 
 // Default (generic) sink

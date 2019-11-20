@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "iterator.h"
 
@@ -10,7 +11,14 @@ typedef struct Array Array;
 
 Array *Array_alloc(size_t count, size_t elem_size);
 
+// Allocates the array on the stack
+Array *Array_alloca(size_t count, size_t elem_size);
+
+// Re-zeroes out the memory of the used array.
 void Array_clear(Array *array);
+
+// Reallocates the array with a new size. Returns new array!
+Array *Array_realloc(Array *array, size_t count);
 
 // Gets the number of elements in the Array
 size_t Array_count(const Array *array);
@@ -22,18 +30,18 @@ void Array_free(Array *array);
 size_t Array_element_size(const Array *array);
 
 // Gets the data for the array.
-void *Array_get_data(const Array *array);
+void *Array_get_data(Array *array);
 
 // Gets the item at `index'
-void *Array_get(const Array *array, size_t index);
+void *Array_get(Array *array, size_t index);
 
 // Sets the item at `index' to the given data.
 // `index' must be within the bounds of the array.
-void Array_set(const Array *array, size_t index, const void *elem);
+void Array_set(Array *array, size_t index, const void *elem);
 
 // Sets the data at `index' to the given data.
 // `index' and data must be within the bounds of the array.
-void Array_set_range(const Array *array, size_t index, const void *elem,
+void Array_set_range(Array *array, size_t index, const void *buffer,
                      int count);
 
 // Copies a array. Returns whether successful.

@@ -41,7 +41,7 @@ int _Map_hash(const Map *map, const void *key) {
   ASSERT(map != NULL);
   ASSERT(key != NULL);
 
-  int hash = (*map->key_info.hash_fn)(key);
+  int hash = map->key_info.hash_fn(key);
   return hash > 0 ? hash : -hash;
 }
 
@@ -242,7 +242,7 @@ const KeyValuePair *_Map_find_ext(const Map *map, const void *key, int hash) {
   for (size_t i = 0; i < nitems; i++) {
     KeyValuePair *kvp = List_get(bucket->key_value_pairs, i);
     int ihash = _Map_hash(map, kvp->key);
-    if (ihash == hash && (*map->key_info.eq_fn)(kvp->key, key)) {
+    if (ihash == hash && map->key_info.eq_fn(kvp->key, key)) {
       return kvp;
     }
   }
@@ -298,7 +298,7 @@ void Map_delete(Map *map, const void *key) {
   for (size_t i = 0; i < nitems; i++) {
     KeyValuePair *kvp = List_get(bucket->key_value_pairs, i);
     int ihash = _Map_hash(map, kvp->key);
-    if (ihash == hash && (*map->key_info.eq_fn)(kvp->key, key)) {
+    if (ihash == hash && map->key_info.eq_fn(kvp->key, key)) {
       free(kvp->key);
       free(kvp->value);
       List_remove(bucket->key_value_pairs, i);

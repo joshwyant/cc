@@ -40,7 +40,7 @@ int _Set_hash(const Set *set, const void *key) {
   ASSERT(set != NULL);
   ASSERT(key != NULL);
 
-  int hash = (*set->key_info.hash_fn)(key);
+  int hash = set->key_info.hash_fn(key);
   return hash > 0 ? hash : -hash;
 }
 
@@ -228,7 +228,7 @@ const void *_Set_find_ext(const Set *set, const void *key, int hash) {
   for (size_t i = 0; i < nitems; i++) {
     void **ptrval = List_get(bucket->items, i);
     int ihash = _Set_hash(set, *ptrval);
-    if (ihash == hash && (*set->key_info.eq_fn)(*ptrval, key)) {
+    if (ihash == hash && set->key_info.eq_fn(*ptrval, key)) {
       return *ptrval;
     }
   }
@@ -275,7 +275,7 @@ void Set_delete(Set *set, const void *key) {
   for (size_t i = 0; i < nitems; i++) {
     void **ptrval = List_get(bucket->items, i);
     int ihash = _Set_hash(set, *ptrval);
-    if (ihash == hash && (*set->key_info.eq_fn)(*ptrval, key)) {
+    if (ihash == hash && set->key_info.eq_fn(*ptrval, key)) {
       free(*ptrval);
       List_remove(bucket->items, i);
       set->count--;

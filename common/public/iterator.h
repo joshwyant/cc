@@ -76,7 +76,7 @@ struct KeyInfo {
 
 struct RelationalKeyInfo {
   KeyInfo *key_info;
-  int (*comare_fn)(const void *a, const void *b);
+  int (*compare_fn)(const void *a, const void *b);
 };
 
 struct KeyValuePair {

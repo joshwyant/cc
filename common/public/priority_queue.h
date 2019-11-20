@@ -74,7 +74,8 @@ bool PriorityQueue_copy(PriorityQueue *dest_queue, const PriorityQueue *queue);
 // Modifies the priority queue!
 void PriorityQueue_get_iterator(const PriorityQueue *queue, Iterator *iter);
 
-// Gets a Sink for this queue.
+// Gets a Sink for this queue. Must sink KeyValuePair.
+// Sink function returns NULL.
 void PriorityQueue_get_sink(const PriorityQueue *queue, Sink *sink);
 
 #endif // COMMON_PUBLIC_PRIORITY_QUEUE_H__

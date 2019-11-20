@@ -1,4 +1,3 @@
-#include "public/array.h"
 #include "protected/array.h"
 
 #include <string.h>

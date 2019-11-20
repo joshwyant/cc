@@ -19,7 +19,7 @@ void for_each(Iterator *iter, void (*action)(void *elem)) {
   ASSERT(iter != NULL);
   if (action) {
     while (iter->move_next(iter)) {
-      (*action)(iter->current(iter));
+      action(iter->current(iter));
     }
   }
 }
@@ -30,7 +30,7 @@ void for_each_ext(Iterator *iter,
 
   if (action) {
     while (iter->move_next(iter)) {
-      (*action)(iter->current(iter), iter);
+      action(iter->current(iter), iter);
     }
   }
 }

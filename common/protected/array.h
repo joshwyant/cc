@@ -1,6 +1,8 @@
 #ifndef COMMON_PROTECTED_ARRAY_H__
 #define COMMON_PROTECTED_ARRAY_H__
 
+#include "../public/array.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 

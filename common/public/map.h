@@ -84,32 +84,82 @@ void Map_get_key_iterator(const Map *map, Iterator *iter);
 // Gets a value Iterator for this Map in an undefined order.
 void Map_get_value_iterator(const Map *map, Iterator *iter);
 
-#define DECLARE_MAP(name, Key_T, Value_T) \
-typedef struct Map name##Map;\
-typedef struct KeyValuePair name##KeyValuePair;\
-extern KeyInfo name##key_info;\
-name##Map *name##Map_alloc();\
-const name##KeyValuePair name##Map_add(name##Map *map, const Key_T key, const Value_T data);\
-const name##KeyValuePair name##Map_add_ref(name##Map *map, const Key_T *key, const Value_T *data);\
-const name##KeyValuePair name##Map_find(const name##Map *map, const Key_T key);\
-const name##KeyValuePair name##Map_find_ref(const name##Map *map, const Key_T key);\
-Value_T name##Map_get(const name##Map *map, const Key_T key);\
-bool name##Map_get_ref(const name##Map *map, const Key_T *key, Value_T *data_out);\
-bool name##Map_exists(const name##Map *map, const Key_T key);\
-bool name##Map_exists_ref(const name##Map *map, const Key_T *key);\
-void name##Map_delete(name##Map *map, const Key_T key);\
-void name##Map_delete_ref(name##Map *map, const Key_T *key);\
-bool name##Map_copy(name##Map *dest_map, const name##Map *map);\
-bool name##Map_union(name##Map *dest_map, const name##Map *a, const name##Map *b);\
-bool name##Map_intersection(name##Map *dest_map, const name##Map *a, const name##Map *b);\
-bool name##Map_difference(name##Map *dest_map, const name##Map *a, const name##Map *b);\
-bool name##Map_symmetric_difference(name##Map *dest_map, const name##Map *a, const name##Map *b);\
-bool name##Map_union_with(name##Map *dest_map, const name##Map *map);\
-bool name##Map_intersect_with(name##Map *dest_map, const name##Map *map);\
-bool name##Map_difference_with(name##Map *dest_map, const name##Map *map);\
-bool name##Map_symmetric_difference_with(name##Map *dest_map, const name##Map *map);\
-void name##Map_get_iterator(const name##Map *map, name##Iterator *iter);\
-void name##Map_get_key_iterator(const name##Map *map, name##Iterator *iter);\
-void name##Map_get_value_iterator(const name##Map *map, name##Iterator *iter);
+#define DECLARE_MAP(name, Key_T, Value_T)                                      \
+  typedef struct Map name##Map;                                                \
+  typedef struct KeyValuePair name##KeyValuePair;                              \
+  extern KeyInfo name##key_info;                                               \
+  name##Map *name##Map_alloc();                                                \
+  const name##KeyValuePair name##Map_add(name##Map *map, const Key_T key,      \
+                                         const Value_T data);                  \
+  const name##KeyValuePair name##Map_add_ref(name##Map *map, const Key_T *key, \
+                                             const Value_T *data);             \
+  const name##KeyValuePair name##Map_find(const name##Map *map,                \
+                                          const Key_T key);                    \
+  const name##KeyValuePair name##Map_find_ref(const name##Map *map,            \
+                                              const Key_T key);                \
+  Value_T name##Map_get(const name##Map *map, const Key_T key);                \
+  bool name##Map_get_ref(const name##Map *map, const Key_T *key,               \
+                         Value_T *data_out);                                   \
+  bool name##Map_exists(const name##Map *map, const Key_T key);                \
+  bool name##Map_exists_ref(const name##Map *map, const Key_T *key);           \
+  void name##Map_delete(name##Map *map, const Key_T key);                      \
+  void name##Map_delete_ref(name##Map *map, const Key_T *key);                 \
+  bool name##Map_copy(name##Map *dest_map, const name##Map *map);              \
+  bool name##Map_union(name##Map *dest_map, const name##Map *a,                \
+                       const name##Map *b);                                    \
+  bool name##Map_intersection(name##Map *dest_map, const name##Map *a,         \
+                              const name##Map *b);                             \
+  bool name##Map_difference(name##Map *dest_map, const name##Map *a,           \
+                            const name##Map *b);                               \
+  bool name##Map_symmetric_difference(name##Map *dest_map, const name##Map *a, \
+                                      const name##Map *b);                     \
+  bool name##Map_union_with(name##Map *dest_map, const name##Map *map);        \
+  bool name##Map_intersect_with(name##Map *dest_map, const name##Map *map);    \
+  bool name##Map_difference_with(name##Map *dest_map, const name##Map *map);   \
+  bool name##Map_symmetric_difference_with(name##Map *dest_map,                \
+                                           const name##Map *map);              \
+  void name##Map_get_iterator(const name##Map *map, name##Iterator *iter);     \
+  void name##Map_get_key_iterator(const name##Map *map, name##Iterator *iter); \
+  void name##Map_get_value_iterator(const name##Map *map, name##Iterator *iter);
+
+#define DECLARE_INT_MAP(name, Value_T) DECLARE_MAP(Int_##name, int, Value_T)
+#define DECLARE_LONG_MAP(name, Value_T) DECLARE_MAP(Long_##name, long, Value_T)
+#define DECLARE_CHAR_MAP(name, Value_T) DECLARE_MAP(Char_##name, char, Value_T)
+#define DECLARE_FLOAT_MAP(name, Value_T)                                       \
+  DECLARE_MAP(Float##name, float, Value_T)
+#define DECLARE_DOUBLE_MAP(name, Value_T)                                      \
+  DECLARE_MAP(Double##name, double, Value_T)
+#define DECLARE_UNSIGNED_INT_MAP(name, Value_T)                                \
+  DECLARE_MAP(UnsignedInt##name, unsigned int, Value_T)
+#define DECLARE_UNSIGNED_LONG_MAP(name, Value_T)                               \
+  DECLARE_MAP(UnsignedLong##name, unsigned long, Value_T)
+#define DECLARE_UNSIGNED_CHAR_MAP(name, Value_T)                               \
+  DECLARE_MAP(UnsignedChar##name, unsigned char, Value_T)
+#define DECLARE_STRING_MAP(name, Value_T)                                      \
+  DECLARE_MAP(String##name, char *, Value_T)
+#define DECLARE_STRING_CASE_MAP(name, Value_T)                                 \
+  DECLARE_MAP(StringCase##name, char *, Value_T)
+
+#define DECLARE_VALUE_MAPS(f) \
+    f(Int, int) \
+    f(Long, long) \
+    f(Char, char) \
+    f(Float, float) \
+    f(Double, double) \
+    f(UnsignedInt, unsigned int) \
+    f(UnsignedLong, unsigned long) \
+    f(UnsignedChar, unsigned char) \
+    f(String, char *) 
+
+DECLARE_VALUE_MAPS(DECLARE_INT_MAP)
+DECLARE_VALUE_MAPS(DECLARE_LONG_MAP)
+DECLARE_VALUE_MAPS(DECLARE_CHAR_MAP)
+DECLARE_VALUE_MAPS(DECLARE_FLOAT_MAP)
+DECLARE_VALUE_MAPS(DECLARE_DOUBLE_MAP)
+DECLARE_VALUE_MAPS(DECLARE_UNSIGNED_INT_MAP)
+DECLARE_VALUE_MAPS(DECLARE_UNSIGNED_LONG_MAP)
+DECLARE_VALUE_MAPS(DECLARE_UNSIGNED_CHAR_MAP)
+DECLARE_VALUE_MAPS(DECLARE_STRING_MAP)
+DECLARE_VALUE_MAPS(DECLARE_STRING_CASE_MAP)
 
 #endif // COMMON_PUBLIC_MAP_H__

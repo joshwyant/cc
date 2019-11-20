@@ -5,6 +5,16 @@
 #include "../test/stubs.h"
 #include "public/assert.h"
 
+DEFINE_ARRAY(Int, int)
+DEFINE_ARRAY(Long, long)
+DEFINE_ARRAY(Char, char)
+DEFINE_ARRAY(Float, float)
+DEFINE_ARRAY(Double, double)
+DEFINE_ARRAY(UnsignedInt, unsigned int)
+DEFINE_ARRAY(UnsignedLong, unsigned long)
+DEFINE_ARRAY(UnsignedChar, unsigned char)
+DEFINE_ARRAY(String, char *)
+
 bool Array_init(Array *array, size_t count, size_t elem_size)
 {
     ASSERT(array != NULL);
@@ -242,11 +252,11 @@ void Array_get_sink(const Array *array, Sink *sink)
   sink->collection_type = COLLECTION_ARRAY;
   sink->collection = (void *)array;
   sink->elem_size = array->elem_size;
-  sink->state = array->data;
+  sink->state = (void*)array->data;
   sink->add = Array_sink_add_;
 }
 
-void *Array_sink_add_(const Sink *sink, const void *elem) 
+void *Array_sink_add_(Sink *sink, const void *elem) 
 {
   ASSERT(sink != NULL);
   Array *array = sink->collection;
@@ -271,7 +281,7 @@ void Array_get_reverse_sink(const Array *array, Sink *sink)
   sink->add = Array_sink_add_;
 }
 
-void *Array_reverse_sink_add_(const Sink *sink, const void *elem) 
+void *Array_reverse_sink_add_(Sink *sink, const void *elem) 
 {
   ASSERT(sink != NULL);
   Array *array = sink->collection;

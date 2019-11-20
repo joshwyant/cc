@@ -47,7 +47,7 @@ DECLARE_ITERATOR_TYPE(, void)
     CollectionType collection_type;                                            \
     void *collection;                                                          \
     size_t elem_size;                                                          \
-    type *(*add)(const name##Sink *sink, const type *elem);                    \
+    type *(*add)(name##Sink *sink, const type *elem);                    \
     void *state;                                                               \
   };
 

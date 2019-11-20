@@ -452,7 +452,7 @@ void List_get_reverse_iterator(const List *list, Iterator *iter)
   iter->version = list->version;
 }
 
-void *List_sink_add_(const Sink *sink, const void *elem);
+void *List_sink_add_(Sink *sink, const void *elem);
 
 void List_get_sink(const List *list, Sink *sink) 
 {
@@ -464,7 +464,7 @@ void List_get_sink(const List *list, Sink *sink)
   sink->add = List_sink_add_;
 }
 
-void *List_sink_add_(const Sink *sink, const void *elem) 
+void *List_sink_add_(Sink *sink, const void *elem) 
 {
   ASSERT(sink != NULL);
   List *list = sink->collection;

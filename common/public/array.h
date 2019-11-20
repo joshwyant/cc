@@ -62,4 +62,81 @@ void Array_get_reverse_sink(const Array *array, Sink *sink);
 // Gets an Indexer for this array
 void Array_get_indexer(const Array *array, Indexer *indexer);
 
+#define DECLARE_ARRAY(name, T)                                                 \
+  typedef struct Array name##Array;                                            \
+  name##Array *name##Array_alloc(size_t count);                                \
+  name##Array *name##Array_alloca(size_t count);                               \
+  T *name##Array_get_data(name##Array *array);                                 \
+  T name##Array_get(name##Array *array, size_t index);                         \
+  T *name##Array_get_ref(name##Array *array, size_t index);                    \
+  void name##Array_set(name##Array *array, size_t index, const T elem);        \
+  void name##Array_set_ref(name##Array *array, size_t index, const T *elem);   \
+  void name##Array_set_range(name##Array *array, size_t index,                 \
+                             const T *buffer, int count);                      \
+  void name##Array_get_iterator(const name##Array *array,                      \
+                                name##Iterator *iter);                         \
+  void name##Array_get_reverse_iterator(const name##Array *array,              \
+                                        name##Iterator *iter);                 \
+  void name##Array_get_sink(const name##Array *array, name##Sink *sink);       \
+  void name##Array_get_reverse_sink(const name##Array *array,                  \
+                                    name##Sink *sink);                         \
+  void name##Array_get_indexer(const name##Array *array,                       \
+                               name##Indexer *indexer);
+
+#define DEFINE_ARRAY(name, T)                                                  \
+  name##Array *name##Array_alloc(size_t count) {                               \
+    return (name##Array *)Array_alloc(count, sizeof(T));                       \
+  }                                                                            \
+  name##Array *name##Array_alloca(size_t count) {                              \
+    return (name##Array *)Array_alloca(count, sizeof(T));                      \
+  }                                                                            \
+  T *name##Array_get_data(name##Array *array) {                                \
+    return (T *)Array_get_data((Array *)array);                                \
+  }                                                                            \
+  T name##Array_get(name##Array *array, size_t index) {                        \
+    return *name##Array_get_ref(array, index);                                 \
+  }                                                                            \
+  T *name##Array_get_ref(name##Array *array, size_t index) {                   \
+    return (T *)Array_get((Array *)array, index);                              \
+  }                                                                            \
+  void name##Array_set(name##Array *array, size_t index, const T elem) {       \
+    name##Array_set_ref(array, index, &elem);                                  \
+  }                                                                            \
+  void name##Array_set_ref(name##Array *array, size_t index, const T *elem) {  \
+    Array_set((Array *)array, index, elem);                                    \
+  }                                                                            \
+  void name##Array_set_range(name##Array *array, size_t index,                 \
+                             const T *buffer, int count) {                     \
+    Array_set_range((Array *)array, index, buffer, count);                     \
+  }                                                                            \
+  void name##Array_get_iterator(const name##Array *array,                      \
+                                name##Iterator *iter) {                        \
+    Array_get_iterator((const Array *)array, (Iterator *)iter);                \
+  }                                                                            \
+  void name##Array_get_reverse_iterator(const name##Array *array,              \
+                                        name##Iterator *iter) {                \
+    Array_get_reverse_iterator((Array *)array, (Iterator *)iter);              \
+  }                                                                            \
+  void name##Array_get_sink(const name##Array *array, name##Sink *sink) {      \
+    Array_get_sink((Array *)array, (Sink *)sink);                              \
+  }                                                                            \
+  void name##Array_get_reverse_sink(const name##Array *array,                  \
+                                    name##Sink *sink) {                        \
+    Array_get_reverse_sink((Array *)array, (Sink *)sink);                      \
+  }                                                                            \
+  void name##Array_get_indexer(const name##Array *array,                       \
+                               name##Indexer *indexer) {                       \
+    Array_get_indexer((Array *)array, (Indexer *)indexer);                     \
+  }
+
+DECLARE_ARRAY(Int, int)
+DECLARE_ARRAY(Long, long)
+DECLARE_ARRAY(Char, char)
+DECLARE_ARRAY(Float, float)
+DECLARE_ARRAY(Double, double)
+DECLARE_ARRAY(UnsignedInt, unsigned int)
+DECLARE_ARRAY(UnsignedLong, unsigned long)
+DECLARE_ARRAY(UnsignedChar, unsigned char)
+DECLARE_ARRAY(String, char *)
+
 #endif // COMMON_PUBLIC_ARRAY_H__

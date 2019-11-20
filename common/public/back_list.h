@@ -57,10 +57,10 @@ BackListNode *BackList_get_next_node(const BackListNode *node);
 BackListNode *BackList_get_previous_node(const BackListNode *node);
 
 // Sets the data in the linked list node.
-void BackList_set(const BackListNode *node, const void *data);
+void BackList_set(const BackList *list, BackListNode *node, const void *data);
 
 // Gets the data item in the linked list node.
-void *BackList_get(const BackListNode *node);
+const void *BackList_get(const BackListNode *node);
 
 // Inserts the given element before the given node. Returns NULL if
 // unsuccessful.

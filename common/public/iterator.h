@@ -33,8 +33,8 @@ typedef enum {
     type *(*current)(const name##Iterator *iter);                              \
     bool (*move_next)(name##Iterator * iter);                                  \
     bool (*eof)(const name##Iterator *iter);                                   \
-    int impl_data1;                                                            \
-    int impl_data2;                                                            \
+    long long impl_data1;                                                            \
+    long long impl_data2;                                                            \
     int version;                                                               \
   };
 

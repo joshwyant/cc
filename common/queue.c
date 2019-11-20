@@ -1,5 +1,7 @@
 #include "protected/queue.h"
 
+#include <string.h>
+
 #include "../test/stubs.h"
 #include "public/assert.h"
 

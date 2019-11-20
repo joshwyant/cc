@@ -54,10 +54,10 @@ LinkedListNode *LinkedList_get_last_node(const LinkedList *list);
 LinkedListNode *LinkedList_get_next_node(const LinkedListNode *node);
 
 // Sets the data in the linked list node.
-void LinkedList_set(const LinkedListNode *node, const void *data);
+void LinkedList_set(const LinkedList *list, LinkedListNode *node, const void *data);
 
 // Gets the data item in the linked list node.
-void *LinkedList_get(const LinkedListNode *node);
+const void *LinkedList_get(const LinkedListNode *node);
 
 // Inserts the given element before the given node. Returns NULL if
 // unsuccessful.
@@ -77,13 +77,14 @@ LinkedListNode *LinkedList_append(LinkedList *list, const void *elem);
 // Returns a pointer to the appended node. Returns NULL if unsuccessful.
 LinkedListNode *LinkedList_prepend(LinkedList *list, const void *elem);
 
-// Removes a node from the list.
+// Removes a node from the list. If it's the last node, it's an O(N) operation.
 void LinkedList_remove(LinkedList *list, LinkedListNode *node);
 
 // Removes the first node from the list.
 void LinkedList_remove_first(LinkedList *list);
 
-// Removes the last node from the list.
+// Removes the last node from the list. This is an O(N) operation.
+// For this reason, an emulated stack should use _prepend() and _remove_first().
 void LinkedList_remove_last(LinkedList *list);
 
 // Removes all the items from the list.

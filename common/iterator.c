@@ -156,7 +156,7 @@ bool Iterator_sort(const Sink *dest, Iterator *iter,
     Iterator_copy(dest, &list_iter);
   }
 out_temp_list:
-  List_free(temp;)
+  List_free(temp_list);
 out:
   return status;
 }

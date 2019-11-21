@@ -45,7 +45,7 @@ void Array_set_range(Array *array, size_t index, const void *buffer,
                      int count);
 
 // Copies a array. Returns whether successful.
-bool Array_copy(Array *dest_array, const Array *array);
+void Array_copy(Array *dest_array, const Array *array);
 
 // Gets an Iterator for this Array
 void Array_get_iterator(const Array *array, Iterator *iter);

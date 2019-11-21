@@ -68,8 +68,8 @@ Map *Map_alloc(KeyInfo *key_info, size_t elem_size) {
   ASSERT(key_info != NULL);
   ASSERT(elem_size > 0);
 
-  Map *map;);
-  if ((map = malloc(sizeof(Map)) == NULL) {
+  Map *map;
+  if ((map = malloc(sizeof(Map))) == NULL) {
     goto error;
   }
   map->buckets = NULL;

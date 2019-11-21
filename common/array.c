@@ -128,7 +128,7 @@ void Array_set_range(Array *array, size_t index, const void *buffer,
     memcpy(array->data + index * array->elem_size, buffer, array->elem_size * count);
 }
 
-bool Array_copy(Array *dest_array, const Array *array)
+void Array_copy(Array *dest_array, const Array *array)
 {
     ASSERT(dest_array != NULL);
     ASSERT(array != NULL);
@@ -174,7 +174,7 @@ bool Array_iter_eof_(const Iterator *iter)
   ASSERT(iter->collection_type == COLLECTION_ARRAY);
   Array *array = iter->collection;
   ASSERT(array != NULL);
-  return Array_empty(array) || iter->impl_data1 >= (int)array->count;
+  return iter->impl_data1 >= (int)array->count;
 }
 
 bool Array_iter_eof_reverse_(const Iterator *iter) 
@@ -183,7 +183,7 @@ bool Array_iter_eof_reverse_(const Iterator *iter)
   ASSERT(iter->collection_type == COLLECTION_ARRAY);
   Array *array = iter->collection;
   ASSERT(array != NULL);
-  return Array_empty(array) || iter->impl_data1 < 0;
+  return iter->impl_data1 < 0;
 }
 
 bool Array_iter_move_next_(Iterator *iter) 
@@ -243,7 +243,7 @@ void Array_get_reverse_iterator(const Array *array, Iterator *iter)
   iter->version = 1;
 }
 
-void *Array_sink_add_(const Sink *sink, const void *elem);
+void *Array_sink_add_(Sink *sink, const void *elem);
 
 void Array_get_sink(const Array *array, Sink *sink) 
 {
@@ -261,14 +261,14 @@ void *Array_sink_add_(Sink *sink, const void *elem)
   ASSERT(sink != NULL);
   Array *array = sink->collection;
   ASSERT(array != NULL);
-  ASSERT(sink->state < array->data + array->count * array->elem_size);
+  ASSERT(sink->state < (void*)array->data + array->count * array->elem_size);
   void *data = sink->state;
   memcpy(data, elem, array->elem_size);
   sink->state += array->elem_size;
   return data;
 }
 
-void *Array_reverse_sink_add_(const Sink *sink, const void *elem);
+void *Array_reverse_sink_add_(Sink *sink, const void *elem);
 
 void Array_get_reverse_sink(const Array *array, Sink *sink) 
 {
@@ -277,7 +277,7 @@ void Array_get_reverse_sink(const Array *array, Sink *sink)
   sink->collection_type = COLLECTION_ARRAY;
   sink->collection = (void *)array;
   sink->elem_size = array->elem_size;
-  sink->state = array->data + (array->count - 1) * array->elem_size;
+  sink->state = (void*)array->data + (array->count - 1) * array->elem_size;
   sink->add = Array_sink_add_;
 }
 
@@ -286,7 +286,7 @@ void *Array_reverse_sink_add_(Sink *sink, const void *elem)
   ASSERT(sink != NULL);
   Array *array = sink->collection;
   ASSERT(array != NULL);
-  ASSERT(sink->state > array->data);
+  ASSERT(sink->state > (void*)array->data);
   void *data = sink->state;
   memcpy(data, elem, array->elem_size);
   sink->state -= array->elem_size;

@@ -24,45 +24,45 @@ typedef enum {
   COLLECTION_CUSTOM = 1 << 9,
 } CollectionType;
 
-#define DECLARE_ITERATOR_TYPE(name, type)                                      \
+#define DECLARE_ITERATOR_TYPE(name, T)                                         \
   typedef struct name##Iterator name##Iterator;                                \
   struct name##Iterator {                                                      \
     CollectionType collection_type;                                            \
     void *collection;                                                          \
     size_t elem_size;                                                          \
-    type *(*current)(const name##Iterator *iter);                              \
+    T *(*current)(const name##Iterator *iter);                                 \
     bool (*move_next)(name##Iterator * iter);                                  \
     bool (*eof)(const name##Iterator *iter);                                   \
-    long long impl_data1;                                                            \
-    long long impl_data2;                                                            \
+    long long impl_data1;                                                      \
+    long long impl_data2;                                                      \
     int version;                                                               \
   };
 
 // Default (generic) iterator
 DECLARE_ITERATOR_TYPE(, void)
 
-#define DECLARE_SINK_TYPE(name, type)                                          \
+#define DECLARE_SINK_TYPE(name, T)                                             \
   typedef struct name##Sink name##Sink;                                        \
   struct name##Sink {                                                          \
     CollectionType collection_type;                                            \
     void *collection;                                                          \
     size_t elem_size;                                                          \
-    type *(*add)(name##Sink *sink, const type *elem);                    \
+    T *(*add)(name##Sink * sink, const T *elem);                               \
     void *state;                                                               \
   };
 
 // Default (generic) sink
 DECLARE_SINK_TYPE(, void)
 
-#define DECLARE_INDEXER_TYPE(name, type)                                       \
+#define DECLARE_INDEXER_TYPE(name, T)                                          \
   typedef struct name##Indexer name##Indexer;                                  \
   struct name##Indexer {                                                       \
     CollectionType collection_type;                                            \
     void *collection;                                                          \
     size_t elem_size;                                                          \
     size_t (*size)(const name##Indexer *indexer);                              \
-    type *(*get)(const name##Indexer *indexer, size_t index);                  \
-    void (*set)(name##Indexer * indexer, size_t index, const type *value);     \
+    T *(*get)(const name##Indexer *indexer, size_t index);                     \
+    void (*set)(name##Indexer * indexer, size_t index, const T *value);        \
   };
 
 // Default (generic) indexer
@@ -118,98 +118,108 @@ int String_hash(const void *key);
 
 int StringCase_hash(const void *key);
 
-#define DECLARE_CONTAINER_FN(name, type, hash_fn, eq_fn)                       \
-  DECLARE_ITERATOR_TYPE(name, type)                                            \
-  DECLARE_INDEXER_TYPE(name, type)                                             \
-  DECLARE_SINK_TYPE(name, type)                                                \
+#define DECLARE_CONTAINER_FN(name, T, hash_fn, eq_fn)                          \
+  DECLARE_ITERATOR_TYPE(name, T)                                               \
+  DECLARE_INDEXER_TYPE(name, T)                                                \
+  DECLARE_SINK_TYPE(name, T)                                                   \
   extern KeyInfo name##KeyInfo;                                                \
   int hash_fn(const void *k);                                                  \
   bool eq_fn(const void *_a, const void *_b);                                  \
-  void name##_for_each(name##Iterator *iter, void (*action)(type * elem));\
-  type name##_reduce(const type initial, name##Iterator *iter,\
-                     type (*reduce_fn)(const type accum, const type elem));
+  void name##_for_each(name##Iterator *iter, void (*action)(T * elem));        \
+  T name##_reduce(const T initial, name##Iterator *iter,                       \
+                  T (*reduce_fn)(const T accum, const T elem));                \
+  bool name##_eof(const name##Iterator *iter);                                 \
+  T name##_next(const name##Iterator *iter);
 
-#define DECLARE_CONTAINER(name, type)                                          \
-  DECLARE_CONTAINER_FN(name, type, name##_hash, name##_eq)
+#define DECLARE_CONTAINER(name, T)                                             \
+  DECLARE_CONTAINER_FN(name, T, name##_hash, name##_eq)
 
-#define DEFINE_CONTAINER_FN(name, type, hash_fn, eq_fn)                        \
-  KeyInfo name##KeyInfo = {sizeof(type), hash_fn, eq_fn};                      \
-  void name##_for_each(name##Iterator *iter, void (*action)(type * elem)) {    \
+#define DEFINE_CONTAINER_FN(name, T, hash_fn, eq_fn)                           \
+  KeyInfo name##KeyInfo = {sizeof(T), hash_fn, eq_fn};                         \
+  void name##_for_each(name##Iterator *iter, void (*action)(T * elem)) {       \
     for_each((Iterator *)iter, (void (*)(void *))action);                      \
+  }                                                                            \
+  bool name##_eof(const name##Iterator *iter) {                                \
+    return iter->eof((const Iterator *)iter);                                  \
+  }                                                                            \
+  T name##_next(const name##Iterator *iter) {                                  \
+    ASSERT(!iter->eof(iter));                                                  \
+    return *(T *)iter->move_next(iter);                                        \
   }
 
-#define DEFINE_CONTAINER(name, type, hash_expr, eq_expr)                       \
+#define DEFINE_CONTAINER(name, T, hash_expr, eq_expr)                          \
   int name##_hash(const void *k) {                                             \
-    type key = *(const type *)k;                                               \
+    T key = *(const T *)k;                                                     \
     return (hash_expr);                                                        \
   }                                                                            \
   bool name##_eq(const void *_a, const void *_b) {                             \
-    type a = *(const type *)_a;                                                \
-    type b = *(const type *)_b;                                                \
+    T a = *(const T *)_a;                                                      \
+    T b = *(const T *)_b;                                                      \
     return (eq_expr);                                                          \
   }                                                                            \
-  type (*_##name##_current_reduce_fn)(const type, const type) = NULL;          \
+  T (*_##name##_current_reduce_fn)(const T, const T) = NULL;                   \
   void _##name##__reduce(const void *dest, const void *elem) {                 \
-    *(type *)dest =                                                            \
-        _##name##_current_reduce_fn(*(const type *)dest, *(const type *)elem); \
+    *(T *)dest =                                                               \
+        _##name##_current_reduce_fn(*(const T *)dest, *(const T *)elem);       \
   }                                                                            \
-  type name##_reduce(const type initial, name##Iterator *iter,                 \
-                     type (*reduce_fn)(const type accum, const type elem)) {   \
-    type (*last_fn)(const type, const type) = _##name##_current_reduce_fn;     \
+  T name##_reduce(const T initial, name##Iterator *iter,                       \
+                  T (*reduce_fn)(const T accum, const T elem)) {               \
+    T (*last_fn)(const T, const T) = _##name##_current_reduce_fn;              \
     _##name##_current_reduce_fn = reduce_fn;                                   \
     Iterator_reduce(&initial, (Iterator *)iter,                                \
                     (void (*)(void *, const void *))_##name##__reduce);        \
     _##name##_current_reduce_fn = last_fn;                                     \
     return initial;                                                            \
   }                                                                            \
-  DEFINE_CONTAINER_FN(name, type, name##_hash, name##_eq)
+  DEFINE_CONTAINER_FN(name, T, name##_hash, name##_eq)
 
-#define DECLARE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)       \
-  DECLARE_CONTAINER_FN(name, type, hash_fn, name##_eq)                         \
+#define DECLARE_RELATIONAL_CONTAINER_FN(name, T, hash_fn, compare_fn)          \
+  DECLARE_CONTAINER_FN(name, T, hash_fn, name##_eq)                            \
   extern RelationalKeyInfo name##RelationalKeyInfo;                            \
   int compare_fn(const void *a, const void *b);
 
-#define DECLARE_RELATIONAL_CONTAINER(name, type)                               \
-  DECLARE_RELATIONAL_CONTAINER_FN(name, type, name##_hash, name##_compare)
+#define DECLARE_RELATIONAL_CONTAINER(name, T)                                  \
+  DECLARE_RELATIONAL_CONTAINER_FN(name, T, name##_hash, name##_compare)
 
-#define DECLARE_CONTAINER_REDUCER(name, type, func_name) \
-  type name##_##func_name(name##Iterator *iter);
+#define DECLARE_CONTAINER_REDUCER(name, T, func_name)                          \
+  T name##_##func_name(name##Iterator *iter);
 
-#define DECLARE_RELATIONAL_CONTAINER_BASIC(name, type) \
-  DECLARE_RELATIONAL_CONTAINER(name, type) \
-  DECLARE_CONTAINER_REDUCER(name, type, sum) \
-  DECLARE_CONTAINER_REDUCER(name, type, product) \
-  DECLARE_CONTAINER_REDUCER(name, type, min) \
-  DECLARE_CONTAINER_REDUCER(name, type, max) 
+#define DECLARE_RELATIONAL_CONTAINER_BASIC(name, T)                            \
+  DECLARE_RELATIONAL_CONTAINER(name, T)                                        \
+  DECLARE_CONTAINER_REDUCER(name, T, sum)                                      \
+  DECLARE_CONTAINER_REDUCER(name, T, product)                                  \
+  DECLARE_CONTAINER_REDUCER(name, T, min)                                      \
+  DECLARE_CONTAINER_REDUCER(name, T, max)
 
-#define DEFINE_RELATIONAL_CONTAINER_FN(name, type, hash_fn, compare_fn)        \
+#define DEFINE_RELATIONAL_CONTAINER_FN(name, T, hash_fn, compare_fn)           \
   bool name##_eq(const void *a, const void *b) {                               \
     return name##_compare(a, b) == 0;                                          \
   }                                                                            \
-  DEFINE_CONTAINER_FN(name, type, hash_fn, name##_eq)                          \
+  DEFINE_CONTAINER_FN(name, T, hash_fn, name##_eq)                             \
   RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, compare_fn};
 
-#define DEFINE_RELATIONAL_CONTAINER(name, type, hash_expr, compare_expr)       \
+#define DEFINE_RELATIONAL_CONTAINER(name, T, hash_expr, compare_expr)          \
   int name##_compare(const void *_a, const void *_b) {                         \
-    type a = *(const type *)_a;                                                \
-    type b = *(const type *)_b;                                                \
+    T a = *(const T *)_a;                                                      \
+    T b = *(const T *)_b;                                                      \
     return (compare_expr);                                                     \
   }                                                                            \
-  DEFINE_CONTAINER(name, type, hash_expr, (name##_compare(_a, _b) == 0))       \
+  DEFINE_CONTAINER(name, T, hash_expr, (name##_compare(_a, _b) == 0))          \
   RelationalKeyInfo name##RelationalKeyInfo = {&name##KeyInfo, name##_compare};
 
-#define DEFINE_CONTAINER_REDUCER(name, type, func_name, initial, expr) \
-  type _##name##__##func_name(const type a, const type b) { return (expr); }\
-  type name##_##func_name(name##Iterator *iter) {\
-    return name##_reduce((initial), iter, _##name##__##func_name);\
+#define DEFINE_CONTAINER_REDUCER(name, T, func_name, initial, expr)            \
+  T _##name##__##func_name(const T a, const T b) { return (expr); }            \
+  T name##_##func_name(name##Iterator *iter) {                                 \
+    return name##_reduce((initial), iter, _##name##__##func_name);             \
   }
 
-#define DEFINE_RELATIONAL_CONTAINER_BASIC(name, type)                          \
-  DEFINE_RELATIONAL_CONTAINER(name, type, key * 7, a - b)\
-  DEFINE_CONTAINER_REDUCER(name, type, sum, 0, a + b) \
-  DEFINE_CONTAINER_REDUCER(name, type, product, 1, a * b) \
-  DEFINE_CONTAINER_REDUCER(name, type, min, (type)0x7FFFFFFFFFFFFFFF, a <= b ? a : b) \
-  DEFINE_CONTAINER_REDUCER(name, type, max, (type)0x8000000000000000, a >= b ? a : b)
+#define DEFINE_RELATIONAL_CONTAINER_BASIC(name, T)                             \
+  DEFINE_RELATIONAL_CONTAINER(name, T, key * 7, a - b)                         \
+  DEFINE_CONTAINER_REDUCER(name, T, sum, 0, a + b)                             \
+  DEFINE_CONTAINER_REDUCER(name, T, product, 1, a *b)                          \
+  DEFINE_CONTAINER_REDUCER(name, T, min, (T)0x7FFFFFFFFFFFFFFF,                \
+                           a <= b ? a : b)                                     \
+  DEFINE_CONTAINER_REDUCER(name, T, max, (T)0x8000000000000000, a >= b ? a : b)
 
 DECLARE_RELATIONAL_CONTAINER(Int, int);
 

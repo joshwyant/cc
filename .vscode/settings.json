@@ -3,7 +3,9 @@
         "list": "c",
         "map.h": "c",
         "typeinfo": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "ctype.h": "c",
+        "_ctype.h": "c"
     },
     "editor.formatOnSave": false,
     "editor.formatOnType": true

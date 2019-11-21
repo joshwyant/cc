@@ -37,7 +37,7 @@ bool Map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size,
                   size_t capacity) {
   struct MapBucket bucket;
   if (!(map->buckets = List_alloc(sizeof(struct MapBucket)))) {
-    return false;
+    goto error;
   }
   map->capacity = capacity;
   map->count = 0;
@@ -45,23 +45,22 @@ bool Map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size,
   map->elem_size = elem_size;
   map->version = 0;
   if (!List_reserve(map->buckets, capacity)) {
-    free(map->buckets);
-    map->buckets = NULL;
-    return false;
+    goto error_buckets;
   }
   for (size_t i = 0; i < capacity; i++) {
     if (NULL == (bucket.key_value_pairs = List_alloc(sizeof(KeyValuePair)))) {
-      free(map->buckets);
-      map->buckets = NULL;
-      return false;
+      goto error_buckets;
     }
     if (!List_add(map->buckets, &bucket)) {
-      free(map->buckets);
-      map->buckets = NULL;
-      return false;
+      goto error_buckets;
     }
   }
   return true;
+error_buckets:
+  free(map->buckets);
+  map->buckets = NULL;
+error:
+  return false;
 }
 
 // Creates a new Map object.
@@ -69,16 +68,19 @@ Map *Map_alloc(KeyInfo *key_info, size_t elem_size) {
   ASSERT(key_info != NULL);
   ASSERT(elem_size > 0);
 
-  Map *map = malloc(sizeof(Map));
-  if (map == NULL) {
-    return NULL;
+  Map *map;);
+  if ((map = malloc(sizeof(Map)) == NULL) {
+    goto error;
   }
   map->buckets = NULL;
   if (!Map_init(map, key_info, elem_size)) {
-    free(map);
-    return NULL;
+    goto error_map;
   }
   return map;
+error_map:
+  free(map);
+error:
+  return NULL;
 }
 
 // Initializes a pre-allocated Map object
@@ -140,16 +142,17 @@ const KeyInfo *Map_key_info(const Map *map) {
 }
 
 bool Map_resize(Map *map, size_t new_capacity) {
+  bool status = false;
   if (map->capacity >= new_capacity) {
-    return true; // Nothing to do.
+    status = true;
+    goto out; // Nothing to do.
   }
-  Map *new_map;
+  Map *new_map = NULL;
   if ((new_map = malloc(sizeof(Map))) == NULL) {
-    return false;
+    goto out;
   }
   if (!Map_init_ext(new_map, &map->key_info, map->elem_size, new_capacity)) {
-    free(new_map);
-    return false;
+    goto out_new_map;
   }
   struct MapBucket *bucket;
   KeyValuePair ikvp;
@@ -160,47 +163,48 @@ bool Map_resize(Map *map, size_t new_capacity) {
     for (size_t j = 0; j < nitems; j++) {
       ikvp = *(KeyValuePair *)List_get(bucket->key_value_pairs, j);
       if (Map_add(new_map, ikvp.key, ikvp.value).key == NULL) {
-        Map_free(new_map);
-        return false;
+        goto out_new_map;
       }
     }
   }
   // Put the new map in place of the old map.
   _Map_swap(map, new_map);
+  status = true;
+out_new_map:
   Map_free(new_map);
-  return true;
+out:
+  return status;
 }
 
 // Copies the key and value to the map and returns pointer to new key/value
 // pair. Returns NULL in the key if unsuccessful.
 const KeyValuePair Map_add(Map *map, const void *key, const void *data) {
+  bool status = false;
+  KeyValuePair null_kvp = {NULL, NULL};
+  KeyValuePair kvp;
   ASSERT(map != NULL);
   ASSERT(key != NULL);
   ASSERT(data != NULL);
 
   if (!map->buckets) {
     // Map needs to be re-initialized.
-    Map_init(map, &map->key_info, map->elem_size);
+    if (!Map_init(map, &map->key_info, map->elem_size)) {
+      goto out;
+    }
   }
-
-  KeyValuePair null_kvp = {NULL, NULL};
-  KeyValuePair kvp;
   const KeyValuePair *pkvp;
   int hash = _Map_hash(map, key);
   if ((pkvp = _Map_find_ext(map, key, hash)) == NULL) {
     size_t ibucket = hash % List_count(map->buckets);
     struct MapBucket *bucket = List_get(map->buckets, ibucket);
     if (!(kvp.key = malloc(map->key_info.key_size))) {
-      return null_kvp;
+      goto out;
     }
     if (!(kvp.value = malloc(map->elem_size))) {
-      free(kvp.key);
-      return null_kvp;
+      goto out_key;
     }
     if (!List_add(bucket->key_value_pairs, &kvp)) {
-      free(kvp.key);
-      free(kvp.value);
-      return null_kvp;
+      goto out_value;
     }
     map->count++;
   }
@@ -216,7 +220,13 @@ const KeyValuePair Map_add(Map *map, const void *key, const void *data) {
               (unsigned long long)(map->capacity << 1));
     }
   }
-  return kvp;
+  status = true;
+out_value:
+  free(kvp.value);
+out_key:
+  free(kvp.key);
+out:
+  return status ? kvp : null_kvp;
 }
 
 const KeyValuePair *_Map_find_ext(const Map *map, const void *key, int hash) {

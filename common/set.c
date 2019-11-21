@@ -36,30 +36,29 @@ int _Set_hash(const Set *set, const void *key) {
 bool Set_init_ext(Set *set, KeyInfo *key_info, size_t capacity) {
   struct SetBucket bucket;
   if (!(set->buckets = List_alloc(sizeof(struct SetBucket)))) {
-    return false;
+    goto error;
   }
   set->capacity = capacity;
   set->count = 0;
   set->key_info = *key_info;
   set->version = 0;
   if (!List_reserve(set->buckets, capacity)) {
-    free(set->buckets);
-    set->buckets = NULL;
-    return false;
+      goto error_buckets;
   }
   for (size_t i = 0; i < capacity; i++) {
     if (NULL == (bucket.items = List_alloc(sizeof(void *)))) {
-      free(set->buckets);
-      set->buckets = NULL;
-      return false;
+      goto error_buckets;
     }
     if (!List_add(set->buckets, &bucket)) {
-      free(set->buckets);
-      set->buckets = NULL;
-      return false;
+      goto error_buckets;
     }
   }
   return true;
+error_buckets:
+  free(set->buckets);
+  set->buckets = NULL;
+error:
+  return false;
 }
 
 // Creates a new Set object.
@@ -136,16 +135,17 @@ const KeyInfo *Set_key_info(const Set *set) {
 }
 
 bool Set_resize(Set *set, size_t new_capacity) {
+  bool status = false;
   if (set->capacity >= new_capacity) {
-    return true; // Nothing to do.
+    status = true;
+    goto out; // Nothing to do.
   }
   Set *new_set;
   if ((new_set = malloc(sizeof(Set))) == NULL) {
-    return false;
+    goto out;
   }
   if (!Set_init_ext(new_set, &set->key_info, new_capacity)) {
-    free(new_set);
-    return false;
+    goto out_new_set;
   }
   struct SetBucket *bucket;
   void **ptrval;
@@ -156,15 +156,16 @@ bool Set_resize(Set *set, size_t new_capacity) {
     for (size_t j = 0; j < nitems; j++) {
       ptrval = List_get(bucket->items, j);
       if (Set_add(new_set, ptrval) == NULL) {
-        Set_free(new_set);
-        return false;
+        goto out_new_set;
       }
     }
   }
   // Put the new set in place of the old set.
   _Set_swap(set, new_set);
+out_new_set:
   Set_free(new_set);
-  return true;
+out:
+  return status;
 }
 
 // Copies the value to the set and returns pointer to the new value.
@@ -178,17 +179,17 @@ void *Set_add(Set *set, const void *key) {
     Set_init(set, &set->key_info);
   }
 
-  void *val;
+  void *val = NULL;
   int hash = _Set_hash(set, key);
   if ((val = (void *)_Set_find_ext(set, key, hash)) == NULL) {
     size_t ibucket = hash % List_count(set->buckets);
     struct SetBucket *bucket = List_get(set->buckets, ibucket);
     if (!(val = malloc(set->key_info.key_size))) {
-      return NULL;
+      goto out;
     }
     if (!List_add(bucket->items, &val)) {
-      free(val);
-      return NULL;
+      val = NULL;
+      goto out_buckets;
     }
     set->count++;
   }
@@ -203,6 +204,9 @@ void *Set_add(Set *set, const void *key) {
               (unsigned long long)(set->capacity << 1));
     }
   }
+out_buckets:
+  free(val);
+out:
   return val;
 }
 

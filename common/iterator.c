@@ -120,6 +120,7 @@ void indexer_sort(const Indexer *indexer,
 
 bool Iterator_sort(const Sink *dest, Iterator *iter,
                int (*compare_fn)(const void *a, const void *b)) {
+  bool status = false;
   Indexer indexer;
   Sink interm_sink;
   List *temp_list;
@@ -140,7 +141,7 @@ bool Iterator_sort(const Sink *dest, Iterator *iter,
     // Use a temporary list
     temp_list = List_alloc(iter->elem_size);
     if (!temp_list) {
-      return false;
+      goto out;
     }
     List_get_indexer(temp_list, &indexer);
     List_get_iterator(temp_list, &list_iter);
@@ -153,9 +154,11 @@ bool Iterator_sort(const Sink *dest, Iterator *iter,
   // Copy and free any temporary list.
   if (temp_list) {
     Iterator_copy(dest, &list_iter);
-    List_free(temp_list);
   }
-  return true;
+out_temp_list:
+  List_free(temp;)
+out:
+  return status;
 }
 
 void Iterator_map(const Sink *dest, Iterator *iter,

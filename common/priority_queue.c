@@ -123,7 +123,7 @@ void trickle_down(PriorityQueue *queue, size_t index)
     int larger_child;
     int multiplier = queue->mode == PQ_MODE_LARGEST_FIRST ? 1 : -1;
     size_t data_size = List_element_size(queue->list);
-    void *top_data = alloca(data_size);
+    char top_data[data_size];
     memcpy(top_data, List_get(queue->list, 0), data_size);
     while (index < queue->count / 2)
     {
@@ -158,7 +158,7 @@ void trickle_up(PriorityQueue *queue, size_t index)
     size_t parent = (index - 1) / 2;
     int multiplier = queue->mode == PQ_MODE_LARGEST_FIRST ? 1 : -1;
     size_t data_size = List_element_size(queue->list);
-    void *bottom_data = alloca(data_size);
+    char bottom_data[data_size];
     memcpy(bottom_data, List_get(queue->list, index), data_size);
 
     while (index > 0 &&
@@ -178,7 +178,7 @@ void *PriorityQueue_enqueue(PriorityQueue *queue, const void *key,
     ASSERT(queue);
     ASSERT(key);
     ASSERT(data);
-    void *buffer = alloca(List_element_size(queue->list));
+    char buffer[List_element_size(queue->list)];
     memcpy(buffer, key, queue->key_info->key_info->key_size);
     memcpy(buffer + queue->key_info->key_info->key_size, data, queue->elem_size);
     if (queue->count >= List_count(queue->list)) {
@@ -281,8 +281,8 @@ bool PriorityQueue_iter_move_next_(Iterator *iter)
   if (PriorityQueue_iter_eof_(iter)) {
     return false;
   }
-  void *dummy_key = alloca(queue->key_info->key_info->key_size);
-  void *dummy_value = alloca(queue->elem_size);
+  char dummy_key[queue->key_info->key_info->key_size];
+  char dummy_value[queue->elem_size];
   PriorityQueue_dequeue(queue, dummy_key, dummy_value);
   return PriorityQueue_iter_eof_(iter);
   // TODO: Test this logic.

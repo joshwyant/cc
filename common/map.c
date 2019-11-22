@@ -6,7 +6,7 @@
 #include "../test/stubs.h"
 #include "public/assert.h"
 #include "public/iterator.h"
-#include "public/list.h"
+#include "public/vector.h"
 
 // TODO:
 // - Version
@@ -36,7 +36,7 @@ int _Map_hash(const Map *map, const void *key) {
 bool Map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size,
                   size_t capacity) {
   struct MapBucket bucket;
-  if (!(map->buckets = List_alloc(sizeof(struct MapBucket)))) {
+  if (!(map->buckets = Vector_alloc(sizeof(struct MapBucket)))) {
     goto error;
   }
   map->capacity = capacity;
@@ -44,14 +44,14 @@ bool Map_init_ext(Map *map, KeyInfo *key_info, size_t elem_size,
   map->key_info = *key_info;
   map->elem_size = elem_size;
   map->version = 0;
-  if (!List_reserve(map->buckets, capacity)) {
+  if (!Vector_reserve(map->buckets, capacity)) {
     goto error_buckets;
   }
   for (size_t i = 0; i < capacity; i++) {
-    if (NULL == (bucket.key_value_pairs = List_alloc(sizeof(KeyValuePair)))) {
+    if (NULL == (bucket.key_value_pairs = Vector_alloc(sizeof(KeyValuePair)))) {
       goto error_buckets;
     }
-    if (!List_add(map->buckets, &bucket)) {
+    if (!Vector_add(map->buckets, &bucket)) {
       goto error_buckets;
     }
   }
@@ -120,7 +120,7 @@ void Map_cleanup(Map *map) {
 
   Map_clear(map);
   if (map->buckets != NULL) {
-    List_free(map->buckets);
+    Vector_free(map->buckets);
     map->buckets = NULL;
   }
   map->capacity = 0;
@@ -156,12 +156,12 @@ bool Map_resize(Map *map, size_t new_capacity) {
   }
   struct MapBucket *bucket;
   KeyValuePair ikvp;
-  size_t nbuckets = List_count(map->buckets);
+  size_t nbuckets = Vector_count(map->buckets);
   for (size_t i = 0; i < nbuckets; i++) {
-    bucket = List_get(map->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    bucket = Vector_get(map->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      ikvp = *(KeyValuePair *)List_get(bucket->key_value_pairs, j);
+      ikvp = *(KeyValuePair *)Vector_get(bucket->key_value_pairs, j);
       if (Map_add(new_map, ikvp.key, ikvp.value).key == NULL) {
         goto out_new_map;
       }
@@ -195,15 +195,15 @@ const KeyValuePair Map_add(Map *map, const void *key, const void *data) {
   const KeyValuePair *pkvp;
   int hash = _Map_hash(map, key);
   if ((pkvp = _Map_find_ext(map, key, hash)) == NULL) {
-    size_t ibucket = hash % List_count(map->buckets);
-    struct MapBucket *bucket = List_get(map->buckets, ibucket);
+    size_t ibucket = hash % Vector_count(map->buckets);
+    struct MapBucket *bucket = Vector_get(map->buckets, ibucket);
     if (!(kvp.key = malloc(map->key_info.key_size))) {
       goto out;
     }
     if (!(kvp.value = malloc(map->elem_size))) {
       goto out_key;
     }
-    if (!List_add(bucket->key_value_pairs, &kvp)) {
+    if (!Vector_add(bucket->key_value_pairs, &kvp)) {
       goto out_value;
     }
     map->count++;
@@ -234,10 +234,10 @@ const KeyValuePair *_Map_find_ext(const Map *map, const void *key, int hash) {
   ASSERT(key != NULL);
 
   size_t ibucket = hash % map->capacity;
-  struct MapBucket *bucket = List_get(map->buckets, ibucket);
-  size_t nitems = List_count(bucket->key_value_pairs);
+  struct MapBucket *bucket = Vector_get(map->buckets, ibucket);
+  size_t nitems = Vector_count(bucket->key_value_pairs);
   for (size_t i = 0; i < nitems; i++) {
-    KeyValuePair *kvp = List_get(bucket->key_value_pairs, i);
+    KeyValuePair *kvp = Vector_get(bucket->key_value_pairs, i);
     int ihash = _Map_hash(map, kvp->key);
     if (ihash == hash && map->key_info.eq_fn(kvp->key, key)) {
       return kvp;
@@ -290,15 +290,15 @@ void Map_delete(Map *map, const void *key) {
 
   int hash = _Map_hash(map, key);
   size_t ibucket = hash % map->capacity;
-  struct MapBucket *bucket = List_get(map->buckets, ibucket);
-  size_t nitems = List_count(bucket->key_value_pairs);
+  struct MapBucket *bucket = Vector_get(map->buckets, ibucket);
+  size_t nitems = Vector_count(bucket->key_value_pairs);
   for (size_t i = 0; i < nitems; i++) {
-    KeyValuePair *kvp = List_get(bucket->key_value_pairs, i);
+    KeyValuePair *kvp = Vector_get(bucket->key_value_pairs, i);
     int ihash = _Map_hash(map, kvp->key);
     if (ihash == hash && map->key_info.eq_fn(kvp->key, key)) {
       free(kvp->key);
       free(kvp->value);
-      List_remove(bucket->key_value_pairs, i);
+      Vector_remove(bucket->key_value_pairs, i);
       map->count--;
       return;
     }
@@ -311,18 +311,18 @@ void Map_clear(Map *map) {
   ASSERT(map != NULL);
 
   struct MapBucket *bucket;
-  List *kvps;
+  Vector *kvps;
   KeyValuePair *kvp;
   for (size_t i = 0; i < map->capacity; i++) {
-    bucket = List_get(map->buckets, i);
+    bucket = Vector_get(map->buckets, i);
     kvps = bucket->key_value_pairs;
-    size_t nkvps = List_count(kvps);
+    size_t nkvps = Vector_count(kvps);
     for (size_t j = 0; j < nkvps; j++) {
-      kvp = List_get(kvps, j);
+      kvp = Vector_get(kvps, j);
       free(kvp->key);
       free(kvp->value);
     }
-    List_clear(kvps);
+    Vector_clear(kvps);
   }
 }
 
@@ -337,10 +337,10 @@ bool Map_copy(Map *dest_map, const Map *map) {
   }
   KeyValuePair *kvp;
   for (size_t i = 0; i < map->capacity; i++) {
-    struct MapBucket *bucket = List_get(map->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(map->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
       }
@@ -357,20 +357,20 @@ bool Map_union(Map *dest_map, const Map *a, const Map *b) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct MapBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
       }
     }
   }
   for (size_t i = 0; i < b->capacity; i++) {
-    struct MapBucket *bucket = List_get(b->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(b->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
       }
@@ -387,10 +387,10 @@ bool Map_intersection(Map *dest_map, const Map *a, const Map *b) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct MapBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_exists(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
@@ -409,10 +409,10 @@ bool Map_difference(Map *dest_map, const Map *a, const Map *b) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct MapBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (Map_exists(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
@@ -431,10 +431,10 @@ bool Map_symmetric_difference(Map *dest_map, const Map *a, const Map *b) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct MapBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (Map_exists(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
@@ -443,10 +443,10 @@ bool Map_symmetric_difference(Map *dest_map, const Map *a, const Map *b) {
     }
   }
   for (size_t i = 0; i < b->capacity; i++) {
-    struct MapBucket *bucket = List_get(b->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(b->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (Map_exists(a, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
@@ -464,10 +464,10 @@ bool Map_union_with(Map *dest_map, const Map *map) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < map->capacity; i++) {
-    struct MapBucket *bucket = List_get(map->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(map->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
       }
@@ -483,16 +483,16 @@ bool Map_intersect_with(Map *dest_map, const Map *map) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < dest_map->capacity; i++) {
-    struct MapBucket *bucket = List_get(dest_map->buckets, i);
+    struct MapBucket *bucket = Vector_get(dest_map->buckets, i);
     for (size_t j = 0;
          j <
-         List_count(bucket->key_value_pairs) /* inline due to modification */;
+         Vector_count(bucket->key_value_pairs) /* inline due to modification */;
          j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (!Map_exists(map, kvp->key)) {
         free(kvp->key);
         free(kvp->value);
-        List_remove(bucket->key_value_pairs,
+        Vector_remove(bucket->key_value_pairs,
                     j-- /* j doesn't change after removal */);
       }
     }
@@ -507,16 +507,16 @@ bool Map_difference_with(Map *dest_map, const Map *map) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < dest_map->capacity; i++) {
-    struct MapBucket *bucket = List_get(dest_map->buckets, i);
+    struct MapBucket *bucket = Vector_get(dest_map->buckets, i);
     for (size_t j = 0;
          j <
-         List_count(bucket->key_value_pairs) /* inline due to modification */;
+         Vector_count(bucket->key_value_pairs) /* inline due to modification */;
          j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (Map_exists(map, kvp->key)) {
         free(kvp->key);
         free(kvp->value);
-        List_remove(bucket->key_value_pairs,
+        Vector_remove(bucket->key_value_pairs,
                     j-- /* j doesn't change after removal */);
       }
     }
@@ -531,10 +531,10 @@ bool Map_symmetric_difference_with(Map *dest_map, const Map *map) {
 
   KeyValuePair *kvp;
   for (size_t i = 0; i < map->capacity; i++) {
-    struct MapBucket *bucket = List_get(map->buckets, i);
-    size_t nitems = List_count(bucket->key_value_pairs);
+    struct MapBucket *bucket = Vector_get(map->buckets, i);
+    size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
-      kvp = List_get(bucket->key_value_pairs, j);
+      kvp = Vector_get(bucket->key_value_pairs, j);
       if (Map_exists(dest_map, kvp->key)) {
         Map_delete(dest_map, kvp->key);
       } else {
@@ -561,8 +561,8 @@ void *Map_iter_current_(const Iterator *iter) {
   if (Map_iter_eof_(iter)) {
     return NULL;
   }
-  return ((KeyValuePair *)List_get(
-      ((struct MapBucket *)List_get(map->buckets, iter->impl_data1))
+  return ((KeyValuePair *)Vector_get(
+      ((struct MapBucket *)Vector_get(map->buckets, iter->impl_data1))
           ->key_value_pairs,
       iter->impl_data2));
 }
@@ -577,8 +577,8 @@ void *Map_key_iter_current_(const Iterator *iter) {
   if (Map_iter_eof_(iter)) {
     return NULL;
   }
-  return ((KeyValuePair *)List_get(
-              ((struct MapBucket *)List_get(map->buckets, iter->impl_data1))
+  return ((KeyValuePair *)Vector_get(
+              ((struct MapBucket *)Vector_get(map->buckets, iter->impl_data1))
                   ->key_value_pairs,
               iter->impl_data2))
       ->key;
@@ -594,8 +594,8 @@ void *Map_value_iter_current_(const Iterator *iter) {
   if (Map_iter_eof_(iter)) {
     return NULL;
   }
-  return ((KeyValuePair *)List_get(
-              ((struct MapBucket *)List_get(map->buckets, iter->impl_data1))
+  return ((KeyValuePair *)Vector_get(
+              ((struct MapBucket *)Vector_get(map->buckets, iter->impl_data1))
                   ->key_value_pairs,
               iter->impl_data2))
       ->value;
@@ -623,7 +623,7 @@ bool Map_iter_move_next_(Iterator *iter) {
   }
   iter->impl_data2++;
   while (iter->impl_data1 == -1 ||
-         iter->impl_data2 >= List_count(((struct MapBucket *)List_get(
+         iter->impl_data2 >= Vector_count(((struct MapBucket *)Vector_get(
                                             map->buckets, iter->impl_data1))
                                            ->key_value_pairs)) {
     iter->impl_data1++;

@@ -5,11 +5,11 @@
 #include <stddef.h>
 
 #include "../public/priority_queue.h"
-#include "../public/list.h"
+#include "../public/vector.h"
 
 struct PriorityQueue
 {
-    List *list;
+    Vector *list;
     PriorityQueueMode mode;
     RelationalKeyInfo *key_info;
     size_t count;

@@ -4,9 +4,10 @@ char *make_string(CharList *list);
 Token make_token(TokenKind kind, CharList *buffer);
 
 // Iterator function. Call multiple times to get a stream of tokens.
-DEFINE_GENERATOR(Token, lex, 
-    char, t, 
-    Token, new_t, 
+DEFINE_GENERATOR(/* Data type: */ Token, /* Name: */ Lex,
+// State variables:
+    char, t,
+    Token, new_t,
     CharList *, buffer) {
   buffer = CharList_alloc();
   while (!Char_eof(input)) {

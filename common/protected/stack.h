@@ -2,13 +2,13 @@
 #define COMMON_PROTECTED_STACK_H__
 
 #include "../public/stack.h"
-#include "../public/list.h"
+#include "../public/vector.h"
 
 #include <stdlib.h>
 
 struct Stack
 {
-    List *list;
+    Vector *list;
     size_t current;
     size_t elem_size;
     int version;

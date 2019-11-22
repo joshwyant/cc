@@ -6,7 +6,7 @@
 #include "../test/stubs.h"
 #include "public/assert.h"
 #include "public/iterator.h"
-#include "public/list.h"
+#include "public/vector.h"
 
 // TODO:
 // - Version
@@ -35,21 +35,21 @@ int _Set_hash(const Set *set, const void *key) {
 // Initializes a pre-allocated Set object with a custom capacity
 bool Set_init_ext(Set *set, KeyInfo *key_info, size_t capacity) {
   struct SetBucket bucket;
-  if (!(set->buckets = List_alloc(sizeof(struct SetBucket)))) {
+  if (!(set->buckets = Vector_alloc(sizeof(struct SetBucket)))) {
     goto error;
   }
   set->capacity = capacity;
   set->count = 0;
   set->key_info = *key_info;
   set->version = 0;
-  if (!List_reserve(set->buckets, capacity)) {
+  if (!Vector_reserve(set->buckets, capacity)) {
       goto error_buckets;
   }
   for (size_t i = 0; i < capacity; i++) {
-    if (NULL == (bucket.items = List_alloc(sizeof(void *)))) {
+    if (NULL == (bucket.items = Vector_alloc(sizeof(void *)))) {
       goto error_buckets;
     }
-    if (!List_add(set->buckets, &bucket)) {
+    if (!Vector_add(set->buckets, &bucket)) {
       goto error_buckets;
     }
   }
@@ -113,7 +113,7 @@ void Set_cleanup(Set *set) {
 
   Set_clear(set);
   if (set->buckets != NULL) {
-    List_free(set->buckets);
+    Vector_free(set->buckets);
     set->buckets = NULL;
   }
   set->capacity = 0;
@@ -149,12 +149,12 @@ bool Set_resize(Set *set, size_t new_capacity) {
   }
   struct SetBucket *bucket;
   void **ptrval;
-  size_t nbuckets = List_count(set->buckets);
+  size_t nbuckets = Vector_count(set->buckets);
   for (size_t i = 0; i < nbuckets; i++) {
-    bucket = List_get(set->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    bucket = Vector_get(set->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (Set_add(new_set, ptrval) == NULL) {
         goto out_new_set;
       }
@@ -182,12 +182,12 @@ void *Set_add(Set *set, const void *key) {
   void *val = NULL;
   int hash = _Set_hash(set, key);
   if ((val = (void *)_Set_find_ext(set, key, hash)) == NULL) {
-    size_t ibucket = hash % List_count(set->buckets);
-    struct SetBucket *bucket = List_get(set->buckets, ibucket);
+    size_t ibucket = hash % Vector_count(set->buckets);
+    struct SetBucket *bucket = Vector_get(set->buckets, ibucket);
     if (!(val = malloc(set->key_info.key_size))) {
       goto out;
     }
-    if (!List_add(bucket->items, &val)) {
+    if (!Vector_add(bucket->items, &val)) {
       val = NULL;
       goto out_buckets;
     }
@@ -215,10 +215,10 @@ const void *_Set_find_ext(const Set *set, const void *key, int hash) {
   ASSERT(key != NULL);
 
   size_t ibucket = hash % set->capacity;
-  struct SetBucket *bucket = List_get(set->buckets, ibucket);
-  size_t nitems = List_count(bucket->items);
+  struct SetBucket *bucket = Vector_get(set->buckets, ibucket);
+  size_t nitems = Vector_count(bucket->items);
   for (size_t i = 0; i < nitems; i++) {
-    void **ptrval = List_get(bucket->items, i);
+    void **ptrval = Vector_get(bucket->items, i);
     int ihash = _Set_hash(set, *ptrval);
     if (ihash == hash && set->key_info.eq_fn(*ptrval, key)) {
       return *ptrval;
@@ -262,14 +262,14 @@ void Set_delete(Set *set, const void *key) {
 
   int hash = _Set_hash(set, key);
   size_t ibucket = hash % set->capacity;
-  struct SetBucket *bucket = List_get(set->buckets, ibucket);
-  size_t nitems = List_count(bucket->items);
+  struct SetBucket *bucket = Vector_get(set->buckets, ibucket);
+  size_t nitems = Vector_count(bucket->items);
   for (size_t i = 0; i < nitems; i++) {
-    void **ptrval = List_get(bucket->items, i);
+    void **ptrval = Vector_get(bucket->items, i);
     int ihash = _Set_hash(set, *ptrval);
     if (ihash == hash && set->key_info.eq_fn(*ptrval, key)) {
       free(*ptrval);
-      List_remove(bucket->items, i);
+      Vector_remove(bucket->items, i);
       set->count--;
       return;
     }
@@ -282,17 +282,17 @@ void Set_clear(Set *set) {
   ASSERT(set != NULL);
 
   struct SetBucket *bucket;
-  List *items;
+  Vector *items;
   void **ptrval;
   for (size_t i = 0; i < set->capacity; i++) {
-    bucket = List_get(set->buckets, i);
+    bucket = Vector_get(set->buckets, i);
     items = bucket->items;
-    size_t nitems = List_count(items);
+    size_t nitems = Vector_count(items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(items, j);
+      ptrval = Vector_get(items, j);
       free(*ptrval);
     }
-    List_clear(items);
+    Vector_clear(items);
   }
 }
 
@@ -307,10 +307,10 @@ bool Set_copy(Set *dest_set, const Set *set) {
   }
   void **ptrval;
   for (size_t i = 0; i < set->capacity; i++) {
-    struct SetBucket *bucket = List_get(set->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(set->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_add(dest_set, *ptrval)) {
         return false;
       }
@@ -327,20 +327,20 @@ bool Set_union(Set *dest_set, const Set *a, const Set *b) {
 
   void **ptrval;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct SetBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_add(dest_set, *ptrval)) {
         return false;
       }
     }
   }
   for (size_t i = 0; i < b->capacity; i++) {
-    struct SetBucket *bucket = List_get(b->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(b->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_add(dest_set, *ptrval)) {
         return false;
       }
@@ -357,10 +357,10 @@ bool Set_intersection(Set *dest_set, const Set *a, const Set *b) {
 
   void **ptrval;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct SetBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_exists(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
@@ -379,10 +379,10 @@ bool Set_difference(Set *dest_set, const Set *a, const Set *b) {
 
   void **ptrval;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct SetBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (Set_exists(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
@@ -401,10 +401,10 @@ bool Set_symmetric_difference(Set *dest_set, const Set *a, const Set *b) {
 
   void **ptrval;
   for (size_t i = 0; i < a->capacity; i++) {
-    struct SetBucket *bucket = List_get(a->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(a->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (Set_exists(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
@@ -413,10 +413,10 @@ bool Set_symmetric_difference(Set *dest_set, const Set *a, const Set *b) {
     }
   }
   for (size_t i = 0; i < b->capacity; i++) {
-    struct SetBucket *bucket = List_get(b->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(b->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (Set_exists(a, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
@@ -434,10 +434,10 @@ bool Set_union_with(Set *dest_set, const Set *set) {
 
   void **ptrval;
   for (size_t i = 0; i < set->capacity; i++) {
-    struct SetBucket *bucket = List_get(set->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(set->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_add(dest_set, *ptrval)) {
         return false;
       }
@@ -453,13 +453,13 @@ bool Set_intersect_with(Set *dest_set, const Set *set) {
 
   void **ptrval;
   for (size_t i = 0; i < dest_set->capacity; i++) {
-    struct SetBucket *bucket = List_get(dest_set->buckets, i);
+    struct SetBucket *bucket = Vector_get(dest_set->buckets, i);
     for (size_t j = 0;
-         j < List_count(bucket->items) /* inline due to modification */; j++) {
-      ptrval = List_get(bucket->items, j);
+         j < Vector_count(bucket->items) /* inline due to modification */; j++) {
+      ptrval = Vector_get(bucket->items, j);
       if (!Set_exists(set, *ptrval)) {
         free(*ptrval);
-        List_remove(bucket->items, j-- /* j doesn't change after removal */);
+        Vector_remove(bucket->items, j-- /* j doesn't change after removal */);
       }
     }
   }
@@ -473,13 +473,13 @@ bool Set_difference_with(Set *dest_set, const Set *set) {
 
   void **ptrval;
   for (size_t i = 0; i < dest_set->capacity; i++) {
-    struct SetBucket *bucket = List_get(dest_set->buckets, i);
+    struct SetBucket *bucket = Vector_get(dest_set->buckets, i);
     for (size_t j = 0;
-         j < List_count(bucket->items) /* inline due to modification */; j++) {
-      ptrval = List_get(bucket->items, j);
+         j < Vector_count(bucket->items) /* inline due to modification */; j++) {
+      ptrval = Vector_get(bucket->items, j);
       if (Set_exists(set, *ptrval)) {
         free(*ptrval);
-        List_remove(bucket->items, j-- /* j doesn't change after removal */);
+        Vector_remove(bucket->items, j-- /* j doesn't change after removal */);
       }
     }
   }
@@ -493,10 +493,10 @@ bool Set_symmetric_difference_with(Set *dest_set, const Set *set) {
 
   void **ptrval;
   for (size_t i = 0; i < set->capacity; i++) {
-    struct SetBucket *bucket = List_get(set->buckets, i);
-    size_t nitems = List_count(bucket->items);
+    struct SetBucket *bucket = Vector_get(set->buckets, i);
+    size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
-      ptrval = List_get(bucket->items, j);
+      ptrval = Vector_get(bucket->items, j);
       if (Set_exists(dest_set, *ptrval)) {
         Set_delete(dest_set, *ptrval);
       } else {
@@ -523,8 +523,8 @@ void *Set_iter_current_(const Iterator *iter) {
   if (Set_iter_eof_(iter)) {
     return NULL;
   }
-  return List_get(
-      ((struct SetBucket *)List_get(set->buckets, iter->impl_data1))->items,
+  return Vector_get(
+      ((struct SetBucket *)Vector_get(set->buckets, iter->impl_data1))->items,
       iter->impl_data2);
 }
 
@@ -550,7 +550,7 @@ bool Set_iter_move_next_(Iterator *iter) {
   }
   iter->impl_data2++;
   while (iter->impl_data1 == -1 ||
-         iter->impl_data2 >= List_count(((struct SetBucket *)List_get(
+         iter->impl_data2 >= Vector_count(((struct SetBucket *)Vector_get(
                                             set->buckets, iter->impl_data1))
                                            ->items)) {
     iter->impl_data1++;

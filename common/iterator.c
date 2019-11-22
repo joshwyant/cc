@@ -4,17 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "public/array.h"
-#include "public/assert.h"
-#include "public/back_list.h"
-#include "public/linked_list.h"
-#include "public/list.h"
-#include "public/map.h"
-#include "public/priority_queue.h"
-#include "public/queue.h"
-#include "public/set.h"
-#include "public/stack.h"
-
 void for_each(Iterator *iter, void (*action)(void *elem)) {
   ASSERT(iter != NULL);
   if (action) {
@@ -56,11 +45,11 @@ void sink_ensure_iterator_size_(const Sink *dest, Iterator *source) {
   case COLLECTION_LIST:
     size = List_count((List *)source->collection);
     break;
-  case COLLECTION_LINKED_LIST:
-    size = LinkedList_count((LinkedList *)source->collection);
+  case COLLECTION_FORWARD_LIST:
+    size = ForwardList_count((ForwardList *)source->collection);
     break;
-  case COLLECTION_BACK_LIST:
-    size = BackList_count((BackList *)source->collection);
+  case COLLECTION_LIST:
+    size = List_count((List *)source->collection);
     break;
   case COLLECTION_STACK:
     size = Stack_count((Stack *)source->collection);

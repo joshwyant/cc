@@ -4,25 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct KeyInfo KeyInfo;
-
-typedef struct RelationalKeyInfo RelationalKeyInfo;
-
-typedef struct KeyValuePair KeyValuePair;
-
-typedef enum {
-  COLLECTION_NONE,
-  COLLECTION_ARRAY = 1 << 0,
-  COLLECTION_LIST = 1 << 1,
-  COLLECTION_LINKED_LIST = 1 << 2,
-  COLLECTION_BACK_LIST = 1 << 3,
-  COLLECTION_STACK = 1 << 4,
-  COLLECTION_QUEUE = 1 << 5,
-  COLLECTION_PRIORITY_QUEUE = 1 << 6,
-  COLLECTION_SET = 1 << 7,
-  COLLECTION_MAP = 1 << 8,
-  COLLECTION_CUSTOM = 1 << 9,
-} CollectionType;
+#include "collections.h"
 
 #define DECLARE_ITERATOR_TYPE(name, T)                                         \
   typedef struct name##Iterator name##Iterator;                                \

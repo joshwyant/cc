@@ -5,10 +5,10 @@
 
 #include <stdlib.h>
 
-#include "../public/list.h"
+#include "../public/vector.h"
 
 struct Map {
-  List *buckets;
+  Vector *buckets;
   KeyInfo key_info;
   size_t elem_size;
   size_t capacity;
@@ -17,7 +17,7 @@ struct Map {
 };
 
 struct MapBucket {
-  List *key_value_pairs;
+  Vector *key_value_pairs;
 };
 
 #endif // #ifndef COMMON_PROTECTED_MAP_H__

@@ -55,7 +55,7 @@ size_t Queue_capacity(const Queue *queue)
 {
     ASSERT(queue != NULL);
 
-    return queue->list ? 0 : List_capacity(queue->list); // actual capacity
+    return queue->list ? 0 : Vector_capacity(queue->list); // actual capacity
 }
 
 bool Queue_reserve(Queue *queue, size_t num_elems)
@@ -64,10 +64,10 @@ bool Queue_reserve(Queue *queue, size_t num_elems)
     ASSERT(num_elems >= 0);
     if (num_elems <= queue->capacity) return true; // Nothing to do
 
-    if (!queue->list && !(queue->list == List_alloc(queue->elem_size))) return false;  
+    if (!queue->list && !(queue->list == Vector_alloc(queue->elem_size))) return false;  
 
-    if (!List_expand(queue->list, num_elems)) return false;
-    void *data = List_get_data(queue->list);
+    if (!Vector_expand(queue->list, num_elems)) return false;
+    void *data = Vector_get_data(queue->list);
     if (queue->begin >= queue->current) {
         // Queue looks like this: [>>>>>---->>>]
         // Must copy in reverse in case (to_shift > added capacity).
@@ -89,7 +89,7 @@ bool Queue_trim(Queue *queue)
     if (!queue->list) return true;
 
     // Compress the queue
-    void *data = List_get_data(queue->list);
+    void *data = Vector_get_data(queue->list);
     if (queue->begin > queue->current) {
         memcpy(data,
                queue->elem_size * queue->begin + data,
@@ -99,8 +99,8 @@ bool Queue_trim(Queue *queue)
                queue->elem_size * queue->begin + data,
                queue->elem_size * queue->count);
     }
-    List_truncate(queue->list, queue->capacity);
-    return List_trim(queue->list);
+    Vector_truncate(queue->list, queue->capacity);
+    return Vector_trim(queue->list);
 }
 
 void Queue_free(Queue *queue)
@@ -113,7 +113,7 @@ void Queue_free(Queue *queue)
 void Queue_cleanup(Queue *queue)
 {
     ASSERT(queue != NULL);
-    List_free(queue->list);
+    Vector_free(queue->list);
     Queue_init(queue, queue->elem_size);
 }
 
@@ -131,7 +131,7 @@ void *Queue_get(const Queue *queue, size_t index)
 
     if (queue->count == 0) return NULL;
 
-    return List_get_data(queue->list) + queue->elem_size * queue->begin;
+    return Vector_get_data(queue->list) + queue->elem_size * queue->begin;
 }
 
 void *Queue_enqueue(Queue *queue, const void *data)
@@ -139,7 +139,7 @@ void *Queue_enqueue(Queue *queue, const void *data)
     ASSERT(queue != NULL);
     ASSERT(data != NULL);
 
-    if (!queue->list && !(queue->list == List_alloc(queue->elem_size))) return NULL;  
+    if (!queue->list && !(queue->list == Vector_alloc(queue->elem_size))) return NULL;  
 
     if (queue->count == queue->capacity) {
         size_t new_capacity = queue->count == 0 ? 1 : 2 * queue->capacity;
@@ -149,7 +149,7 @@ void *Queue_enqueue(Queue *queue, const void *data)
     }
     queue->current += 1;
     queue->current %= queue->capacity;
-    void *new_data = List_get(queue->list, queue->current);
+    void *new_data = Vector_get(queue->list, queue->current);
     memcpy(new_data, data, queue->elem_size);
     return new_data;
 }
@@ -160,7 +160,7 @@ bool Queue_dequeue(Queue *queue, void *data_out)
     ASSERT(data_out != NULL);
 
     if (Queue_empty(queue)) return false;
-    memcpy(data_out, List_get(queue->list, queue->begin), queue->elem_size);
+    memcpy(data_out, Vector_get(queue->list, queue->begin), queue->elem_size);
     queue->begin += 1;
     queue->begin %= queue->capacity;
     return true;
@@ -172,7 +172,7 @@ bool Queue_peek(Queue *queue, void *data_out)
     ASSERT(data_out != NULL);
 
     if (Queue_empty(queue)) return false;
-    memcpy(data_out, List_get(queue->list, queue->begin), queue->elem_size);
+    memcpy(data_out, Vector_get(queue->list, queue->begin), queue->elem_size);
     return true;
 }
 
@@ -184,8 +184,8 @@ void Queue_clear(Queue *queue)
 bool Queue_copy(Queue *dest_queue, const Queue *queue) {
   Queue copy = *queue;
   Queue_init(&copy, queue->elem_size);
-  if (!((copy.list = List_alloc(queue->capacity)) &&
-        (List_copy(copy.list, queue->list)))) {
+  if (!((copy.list = Vector_alloc(queue->capacity)) &&
+        (Vector_copy(copy.list, queue->list)))) {
     return false;
   }
   *dest_queue = *queue;

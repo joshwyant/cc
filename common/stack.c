@@ -20,7 +20,7 @@ bool Stack_init(Stack *stack, size_t elem_size)
 void Stack_cleanup(Stack *stack)
 {
     ASSERT(stack);
-    if (stack->list) List_free(stack->list);
+    if (stack->list) Vector_free(stack->list);
     Stack_init(stack, stack->elem_size);
 }
 
@@ -50,22 +50,22 @@ bool Stack_empty(const Stack *stack)
 size_t Stack_capacity(const Stack *stack)
 {
     ASSERT(stack);
-    return stack->list ? 0 : List_capacity(stack->list); // actual capacity
+    return stack->list ? 0 : Vector_capacity(stack->list); // actual capacity
 }
 
 bool Stack_reserve(Stack *stack, size_t num_elems)
 {
     ASSERT(stack);
     ASSERT(num_elems);
-    return List_reserve(stack->list, num_elems);
+    return Vector_reserve(stack->list, num_elems);
 }
 
 bool Stack_trim(Stack *stack)
 {
     ASSERT(stack);
     if (!stack->list) return true;
-    List_truncate(stack->list, stack->current + 1);
-    return List_trim(stack->list);
+    Vector_truncate(stack->list, stack->current + 1);
+    return Vector_trim(stack->list);
 }
 
 void Stack_free(Stack *stack)
@@ -84,27 +84,27 @@ size_t Stack_element_size(const Stack *stack)
 void *Stack_get_data(const Stack *stack)
 {
     ASSERT(stack);
-    return stack->list ? List_get_data(stack->list) : NULL;
+    return stack->list ? Vector_get_data(stack->list) : NULL;
 }
 
 void *Stack_get(const Stack *stack, size_t index)
 {
     ASSERT(stack);
     ASSERT(index < Stack_count(stack));
-    return stack->list ? List_get(stack->list, index) : NULL;
+    return stack->list ? Vector_get(stack->list, index) : NULL;
 }
 
 void *Stack_push(Stack *stack, const void *data)
 {
     ASSERT(stack);
     ASSERT(data);
-    if (!stack->list && !(stack->list = List_alloc(stack->elem_size))) return NULL;
+    if (!stack->list && !(stack->list = Vector_alloc(stack->elem_size))) return NULL;
     stack->current++;
-    if (stack->current >= List_count(stack->list)) {
-        return List_add(stack->list, data);
+    if (stack->current >= Vector_count(stack->list)) {
+        return Vector_add(stack->list, data);
     } else {
-        List_set(stack->list, stack->current, data);
-        return List_get(stack->list, stack->current);
+        Vector_set(stack->list, stack->current, data);
+        return Vector_get(stack->list, stack->current);
     }
 }
 
@@ -113,7 +113,7 @@ bool Stack_pop(Stack *stack, void *data_out)
     ASSERT(stack);
     ASSERT(data_out);
     if (!stack->list || stack->current < 0) return false;
-    memcpy(data_out, (void*)List_get(stack->list, stack->current--), stack->elem_size);
+    memcpy(data_out, (void*)Vector_get(stack->list, stack->current--), stack->elem_size);
     return true;
 }
 
@@ -122,7 +122,7 @@ bool Stack_peek(const Stack *stack, void *data_out)
     ASSERT(stack);
     ASSERT(data_out);
     if (!stack->list || stack->current < 0) return false;
-    memcpy(data_out, (void*)List_get(stack->list, stack->current), stack->elem_size);
+    memcpy(data_out, (void*)Vector_get(stack->list, stack->current), stack->elem_size);
     return true;
 }
 
@@ -136,8 +136,8 @@ bool Stack_copy(Stack *dest_stack, const Stack *stack)
 {
     ASSERT(dest_stack);
     ASSERT(stack);
-    List *old_list = dest_stack->list;
-    if (!(List_copy(old_list, stack->list))) return false;
+    Vector *old_list = dest_stack->list;
+    if (!(Vector_copy(old_list, stack->list))) return false;
     *dest_stack = *stack;
     dest_stack->list = old_list;
     return true;

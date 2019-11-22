@@ -5,11 +5,11 @@
 #include <stddef.h>
 
 #include "../public/queue.h"
-#include "../public/list.h"
+#include "../public/vector.h"
 
 struct Queue
 {
-    List *list;
+    Vector *list;
     size_t begin;
     size_t current;
     size_t count;

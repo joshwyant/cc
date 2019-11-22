@@ -5,10 +5,10 @@
 
 #include <stdlib.h>
 
-#include "../public/list.h"
+#include "../public/vector.h"
 
 struct Set {
-  List *buckets;
+  Vector *buckets;
   KeyInfo key_info;
   size_t capacity;
   size_t count;
@@ -16,7 +16,7 @@ struct Set {
 };
 
 struct SetBucket {
-  List *items; // Holds void* items to allocated copies
+  Vector *items; // Holds void* items to allocated copies
 };
 
 #endif // COMMON_PROTECTED_SET_H__

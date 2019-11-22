@@ -129,14 +129,4 @@ void Array_get_indexer(const Array *array, Indexer *indexer);
     Array_get_indexer((Array *)array, (Indexer *)indexer);                     \
   }
 
-DECLARE_ARRAY(Int, int)
-DECLARE_ARRAY(Long, long)
-DECLARE_ARRAY(Char, char)
-DECLARE_ARRAY(Float, float)
-DECLARE_ARRAY(Double, double)
-DECLARE_ARRAY(UnsignedInt, unsigned int)
-DECLARE_ARRAY(UnsignedLong, unsigned long)
-DECLARE_ARRAY(UnsignedChar, unsigned char)
-DECLARE_ARRAY(String, char *)
-
 #endif // COMMON_PUBLIC_ARRAY_H__

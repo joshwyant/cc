@@ -5,7 +5,15 @@
         "typeinfo": "cpp",
         "iterator": "cpp",
         "ctype.h": "c",
-        "_ctype.h": "c"
+        "_ctype.h": "c",
+        "algorithm": "cpp",
+        "__debug": "cpp",
+        "exception": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "new": "cpp",
+        "optional": "cpp",
+        "stdexcept": "cpp"
     },
     "editor.formatOnSave": false,
     "editor.formatOnType": true

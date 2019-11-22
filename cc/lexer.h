@@ -25,6 +25,6 @@ struct Token {
 };
 typedef struct Token Token;
 
-DECLARE_GENERATOR(Token, lex)
+DECLARE_GENERATOR(Token, Lex)
 
 #endif // CC_LEXER_H__

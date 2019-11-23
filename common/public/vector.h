@@ -106,7 +106,7 @@ void Vector_get_indexer(const Vector *vector, Indexer *indexer);
   /* A dynamically growing vector. */                                            \
   typedef struct name##Vector name##Vector;                                        \
   /* Creates a new name##Vector object. */                                       \
-  name##Vector *name##Vector_alloc();                                              \
+  name##Vector *name##Vector_alloc(void);                                              \
   /* Gets the data for the vector. */                                            \
   T *name##Vector_get_data(const name##Vector *vector);                              \
   /* Gets the item at `index' */                                               \
@@ -153,7 +153,7 @@ void Vector_get_indexer(const Vector *vector, Indexer *indexer);
   void name##Vector_get_indexer(const name##Vector *self, name##Indexer *indexer);
 
 #define DEFINE_VECTOR(name, T)                                                   \
-  name##Vector *name##Vector_alloc() {                                             \
+  name##Vector *name##Vector_alloc(void) {                                             \
     return (name##Vector *)Vector_alloc(sizeof(T));                                \
   }                                                                            \
   T *name##Vector_get_data(const name##Vector *self) {                             \

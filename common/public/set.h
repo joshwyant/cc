@@ -36,7 +36,7 @@ void *Set_add(Set *set, const void *data);
 bool Set_get(Set *set, const void *key, void *data_out);
 
 // Checks whether the given key exists in the set.
-bool Set_exists(const Set *set, const void *key);
+bool Set_contains(const Set *set, const void *key);
 
 // Removes an item from the set.
 void Set_delete(Set *set, const void *key);

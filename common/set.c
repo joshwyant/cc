@@ -244,7 +244,7 @@ bool Set_get(Set *set, const void *key, void *data_out) {
 }
 
 // Checks whether the given key exists in the set.
-bool Set_exists(const Set *set, const void *key) {
+bool Set_contains(const Set *set, const void *key) {
 
   KeyValuePair null_kvp = {NULL, NULL};
   const void *val;
@@ -361,7 +361,7 @@ bool Set_intersection(Set *dest_set, const Set *a, const Set *b) {
     size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (!Set_exists(b, *ptrval))
+      if (!Set_contains(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
         return false;
@@ -383,7 +383,7 @@ bool Set_difference(Set *dest_set, const Set *a, const Set *b) {
     size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (Set_exists(b, *ptrval))
+      if (Set_contains(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
         return false;
@@ -405,7 +405,7 @@ bool Set_symmetric_difference(Set *dest_set, const Set *a, const Set *b) {
     size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (Set_exists(b, *ptrval))
+      if (Set_contains(b, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
         return false;
@@ -417,7 +417,7 @@ bool Set_symmetric_difference(Set *dest_set, const Set *a, const Set *b) {
     size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (Set_exists(a, *ptrval))
+      if (Set_contains(a, *ptrval))
         continue;
       if (!Set_add(dest_set, *ptrval)) {
         return false;
@@ -457,7 +457,7 @@ bool Set_intersect_with(Set *dest_set, const Set *set) {
     for (size_t j = 0;
          j < Vector_count(bucket->items) /* inline due to modification */; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (!Set_exists(set, *ptrval)) {
+      if (!Set_contains(set, *ptrval)) {
         free(*ptrval);
         Vector_remove(bucket->items, j-- /* j doesn't change after removal */);
       }
@@ -477,7 +477,7 @@ bool Set_difference_with(Set *dest_set, const Set *set) {
     for (size_t j = 0;
          j < Vector_count(bucket->items) /* inline due to modification */; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (Set_exists(set, *ptrval)) {
+      if (Set_contains(set, *ptrval)) {
         free(*ptrval);
         Vector_remove(bucket->items, j-- /* j doesn't change after removal */);
       }
@@ -497,7 +497,7 @@ bool Set_symmetric_difference_with(Set *dest_set, const Set *set) {
     size_t nitems = Vector_count(bucket->items);
     for (size_t j = 0; j < nitems; j++) {
       ptrval = Vector_get(bucket->items, j);
-      if (Set_exists(dest_set, *ptrval)) {
+      if (Set_contains(dest_set, *ptrval)) {
         Set_delete(dest_set, *ptrval);
       } else {
         if (!Set_add(dest_set, *ptrval)) {

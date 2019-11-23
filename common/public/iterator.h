@@ -4,7 +4,27 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "collections.h"
+#include "assert.h"
+
+typedef enum {
+  COLLECTION_NONE,
+  COLLECTION_ARRAY = 1 << 0,
+  COLLECTION_VECTOR = 1 << 1,
+  COLLECTION_LIST = 1 << 2,
+  COLLECTION_FORWARD_LIST = 1 << 3,
+  COLLECTION_STACK = 1 << 4,
+  COLLECTION_QUEUE = 1 << 5,
+  COLLECTION_PRIORITY_QUEUE = 1 << 6,
+  COLLECTION_SET = 1 << 7,
+  COLLECTION_MAP = 1 << 8,
+  COLLECTION_CUSTOM = 1 << 9,
+} CollectionType;
+
+typedef struct KeyInfo KeyInfo;
+
+typedef struct RelationalKeyInfo RelationalKeyInfo;
+
+typedef struct KeyValuePair KeyValuePair;
 
 #define DECLARE_ITERATOR_TYPE(name, T)                                         \
   typedef struct name##Iterator name##Iterator;                                \
@@ -71,12 +91,12 @@ void for_each(Iterator *iter, void (*action)(void *elem));
 void for_each_ext(Iterator *iter,
                   void (*action)(void *elem, const Iterator *iter));
 
-bool Iterator_copy(const Sink *dest, Iterator *iter);
+bool Iterator_copy(Sink *dest, Iterator *iter);
 
 void Indexer_sort(const Indexer *indexer,
                   int (*compare_fn)(const void *a, const void *b));
 
-bool Iterator_sort(const Sink *dest, Iterator *iter,
+bool Iterator_sort(Sink *dest, Iterator *iter,
                    int (*compare_fn)(const void *a, const void *b));
 
 void Iterator_map(const Sink *dest, Iterator *iter,
@@ -111,7 +131,7 @@ int StringCase_hash(const void *key);
   T name##_reduce(const T initial, name##Iterator *iter,                       \
                   T (*reduce_fn)(const T accum, const T elem));                \
   bool name##_eof(const name##Iterator *iter);                                 \
-  T name##_next(const name##Iterator *iter);
+  T name##_next(name##Iterator *iter);
 
 #define DECLARE_CONTAINER(name, T)                                             \
   DECLARE_CONTAINER_FN(name, T, name##_hash, name##_eq)
@@ -122,9 +142,9 @@ int StringCase_hash(const void *key);
     for_each((Iterator *)iter, (void (*)(void *))action);                      \
   }                                                                            \
   bool name##_eof(const name##Iterator *iter) {                                \
-    return iter->eof((const Iterator *)iter);                                  \
+    return iter->eof((const name##Iterator *)iter);                                  \
   }                                                                            \
-  T name##_next(const name##Iterator *iter) {                                  \
+  T name##_next(name##Iterator *iter) {                                  \
     ASSERT(!iter->eof(iter));                                                  \
     return *(T *)iter->move_next(iter);                                        \
   }
@@ -205,6 +225,8 @@ int StringCase_hash(const void *key);
 
 DECLARE_RELATIONAL_CONTAINER(Int, int);
 
+DECLARE_RELATIONAL_CONTAINER(Short, short);
+
 DECLARE_RELATIONAL_CONTAINER(Long, long);
 
 DECLARE_RELATIONAL_CONTAINER(Char, char);
@@ -213,14 +235,21 @@ DECLARE_RELATIONAL_CONTAINER(Float, float);
 
 DECLARE_RELATIONAL_CONTAINER(Double, double);
 
+DECLARE_RELATIONAL_CONTAINER(LongDouble, long double);
+
+DECLARE_RELATIONAL_CONTAINER(Ptr, void *);
+
 DECLARE_RELATIONAL_CONTAINER(UnsignedInt, unsigned int);
 
 DECLARE_RELATIONAL_CONTAINER(UnsignedLong, unsigned long);
+
+DECLARE_RELATIONAL_CONTAINER(UnsignedShort, unsigned short);
 
 DECLARE_RELATIONAL_CONTAINER(UnsignedChar, unsigned char);
 
 DECLARE_RELATIONAL_CONTAINER(String, char *);
 
+// Needed for case-insensitive maps.
 DECLARE_RELATIONAL_CONTAINER(StringCase, char *);
 
 #endif // COMMON_PUBLIC_ITERATOR_H__

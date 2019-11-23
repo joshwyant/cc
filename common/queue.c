@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../test/stubs.h"
+#include "public/collections.h"
 #include "public/assert.h"
 
 bool Queue_init(Queue *queue, size_t elem_size);
@@ -70,13 +71,13 @@ bool Queue_reserve(Queue *queue, size_t num_elems)
     void *data = Vector_get_data(queue->list);
     if (queue->begin >= queue->current) {
         // Queue looks like this: [>>>>>---->>>]
-        // Must copy in reverse in case (to_shift > added capacity).
-        size_t to_shift = num_elems - queue->capacity;
-        for (size_t i = (to_shift - 1); i >= 0; i--) {
-            memcpy(queue->elem_size * (num_elems - queue->capacity + i) + data,
-                   queue->elem_size * (queue->begin + i)                + data,
-                   queue->elem_size);
-        }
+        size_t added_capacity = num_elems - queue->capacity;
+        size_t tail_count = queue->capacity - queue->begin;
+        size_t new_beginning = queue->begin + added_capacity;
+        memmove(queue->elem_size * new_beginning + data,
+                queue->elem_size * queue->begin  + data,
+                queue->elem_size * tail_count);
+        queue->begin = new_beginning;
     }
     queue->capacity = num_elems;
     return true;
@@ -91,13 +92,13 @@ bool Queue_trim(Queue *queue)
     // Compress the queue
     void *data = Vector_get_data(queue->list);
     if (queue->begin > queue->current) {
-        memcpy(data,
-               queue->elem_size * queue->begin + data,
-               queue->elem_size * (queue->capacity - queue->begin));
+        memmove(data,
+                queue->elem_size * queue->begin + data,
+                queue->elem_size * (queue->capacity - queue->begin));
     } else {
-        memcpy(data,
-               queue->elem_size * queue->begin + data,
-               queue->elem_size * queue->count);
+        memmove(data,
+                queue->elem_size * queue->begin + data,
+                queue->elem_size * queue->count);
     }
     Vector_truncate(queue->list, queue->capacity);
     return Vector_trim(queue->list);
@@ -252,7 +253,7 @@ void Queue_get_iterator(const Queue *queue, Iterator *iter)
   iter->version = queue->version;
 }
 
-void *Queue_sink_add_(const Sink *sink, const void *elem);
+void *Queue_sink_add_(Sink *sink, const void *elem);
 
 void Queue_get_sink(const Queue *queue, Sink *sink) 
 {
@@ -264,7 +265,7 @@ void Queue_get_sink(const Queue *queue, Sink *sink)
   sink->add = Queue_sink_add_;
 }
 
-void *Queue_sink_add_(const Sink *sink, const void *elem) 
+void *Queue_sink_add_(Sink *sink, const void *elem) 
 {
   ASSERT(sink != NULL);
   Queue *queue = sink->collection;

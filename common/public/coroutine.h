@@ -19,7 +19,7 @@
 
 #define DECLARE_GENERATOR(T, name) \
 typedef struct name##Generator name##Generator;\
-name##Generator *name##Generator_alloc();\
+name##Generator *name##Generator_alloc(void);\
 bool name##Generator_eof(name##Generator *iter);\
 T name(name##Generator *iter);
 
@@ -32,7 +32,7 @@ struct name##Generator {\
   DFOR_EACH(GENERATOR_DEFINE_MEMBER, __VA_ARGS__)\
 };\
 typedef struct name##Generator name##Generator;\
-name##Generator *name##Generator_alloc() {\
+name##Generator *name##Generator_alloc(void) {\
   return calloc(1, sizeof(name##Generator));\
 }\
 bool name##Generator_eof(name##Generator *iter) {\

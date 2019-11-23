@@ -16,6 +16,19 @@
             //"externalConsole": true,
             //"MIMode": "lldb",
             "preLaunchTask": "clang build common_tests",
+        },
+        {
+            "name": "clang build and debug cc",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/cc",
+            "args": [],
+            //"stopAtEntry": true,
+            "cwd": "${workspaceFolder}/bin",
+            //"environment": [],
+            //"externalConsole": true,
+            //"MIMode": "lldb",
+            "preLaunchTask": "clang build cc",
         }
     ]
 }

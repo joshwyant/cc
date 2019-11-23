@@ -4,6 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "public/array.h"
+#include "public/list.h"
+#include "public/forward_list.h"
+#include "public/map.h"
+#include "public/priority_queue.h"
+#include "public/queue.h"
+#include "public/set.h"
+#include "public/stack.h"
+#include "public/vector.h"
+
 void for_each(Iterator *iter, void (*action)(void *elem)) {
   ASSERT(iter != NULL);
   if (action) {
@@ -28,8 +38,8 @@ void sink_ensure_size_(const Sink *sink, size_t num_elems) {
   ASSERT(sink != NULL);
   ASSERT(num_elems >= 0);
 
-  if (sink->collection_type == COLLECTION_LIST) {
-    List_reserve((List *)sink->collection, num_elems);
+  if (sink->collection_type == COLLECTION_VECTOR) {
+    Vector_reserve((Vector *)sink->collection, num_elems);
   }
 }
 
@@ -42,14 +52,14 @@ void sink_ensure_iterator_size_(const Sink *dest, Iterator *source) {
   case COLLECTION_ARRAY:
     size = Array_count((Array *)source->collection);
     break;
+  case COLLECTION_VECTOR:
+    size = Vector_count((Vector *)source->collection);
+    break;
   case COLLECTION_LIST:
     size = List_count((List *)source->collection);
     break;
   case COLLECTION_FORWARD_LIST:
     size = ForwardList_count((ForwardList *)source->collection);
-    break;
-  case COLLECTION_LIST:
-    size = List_count((List *)source->collection);
     break;
   case COLLECTION_STACK:
     size = Stack_count((Stack *)source->collection);
@@ -74,7 +84,7 @@ void sink_ensure_iterator_size_(const Sink *dest, Iterator *source) {
   }
 }
 
-bool Iterator_copy(const Sink *dest, Iterator *iter) {
+bool Iterator_copy(Sink *dest, Iterator *iter) {
   ASSERT(dest != NULL);
   ASSERT(iter != NULL);
 
@@ -90,11 +100,11 @@ bool Iterator_copy(const Sink *dest, Iterator *iter) {
 
 void indexer_sort(const Indexer *indexer,
                   int (*compare_fn)(const void *a, const void *b)) {
-  ASSERT(indexer->collection_type & (COLLECTION_ARRAY | COLLECTION_LIST));
+  ASSERT(indexer->collection_type & (COLLECTION_ARRAY | COLLECTION_VECTOR));
   void *data = NULL;
   switch (indexer->collection_type) {
-  case COLLECTION_LIST:
-    data = List_get_data((List *)indexer->collection);
+  case COLLECTION_VECTOR:
+    data = Vector_get_data((Vector *)indexer->collection);
     break;
   case COLLECTION_ARRAY:
     data = Array_get_data((Array *)indexer->collection);
@@ -107,20 +117,20 @@ void indexer_sort(const Indexer *indexer,
   }
 }
 
-bool Iterator_sort(const Sink *dest, Iterator *iter,
+bool Iterator_sort(Sink *dest, Iterator *iter,
                int (*compare_fn)(const void *a, const void *b)) {
   bool status = false;
   Indexer indexer;
   Sink interm_sink;
-  List *temp_list;
+  Vector *temp_list;
   Iterator list_iter;
-  const Sink *interm_dest = dest;
-  if (dest->collection_type & (COLLECTION_ARRAY | COLLECTION_LIST)) {
+  Sink *interm_dest = dest;
+  if (dest->collection_type & (COLLECTION_ARRAY | COLLECTION_VECTOR)) {
     // Write directly to the collection instead of using a temporary list
-    if (dest->collection_type == COLLECTION_LIST) {
-      List *dest_list = dest->collection;
-      List_clear(dest_list);
-      List_get_indexer(dest_list, &indexer);
+    if (dest->collection_type == COLLECTION_VECTOR) {
+      Vector *dest_list = dest->collection;
+      Vector_clear(dest_list);
+      Vector_get_indexer(dest_list, &indexer);
     } else {
       Array *dest_array = dest->collection;
       Array_get_indexer(dest_array, &indexer);
@@ -128,13 +138,13 @@ bool Iterator_sort(const Sink *dest, Iterator *iter,
     interm_dest = dest;
   } else {
     // Use a temporary list
-    temp_list = List_alloc(iter->elem_size);
+    temp_list = Vector_alloc(iter->elem_size);
     if (!temp_list) {
       goto out;
     }
-    List_get_indexer(temp_list, &indexer);
-    List_get_iterator(temp_list, &list_iter);
-    List_get_sink(temp_list, &interm_sink);
+    Vector_get_indexer(temp_list, &indexer);
+    Vector_get_iterator(temp_list, &list_iter);
+    Vector_get_sink(temp_list, &interm_sink);
     interm_dest = &interm_sink;
   }
   // Copy the source and sort
@@ -145,7 +155,7 @@ bool Iterator_sort(const Sink *dest, Iterator *iter,
     Iterator_copy(dest, &list_iter);
   }
 out_temp_list:
-  List_free(temp_list);
+  Vector_free(temp_list);
 out:
   return status;
 }
@@ -158,6 +168,9 @@ void Iterator_flat_map(const Sink *dest, Iterator *iter,
 
 void Iterator_filter(const Sink *dest, Iterator *iter,
                  bool (*filter_fn)(const void *elem)) {}
+
+void Iterator_reduce(const void *dest, Iterator *iter,
+                     void (*reduce_fn)(void *dest, const void *elem)) {}
 
 int String_compare(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
@@ -187,11 +200,17 @@ DEFINE_RELATIONAL_CONTAINER_BASIC(Int, int)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(Long, long)
 
+DEFINE_RELATIONAL_CONTAINER_BASIC(Short, short)
+
 DEFINE_RELATIONAL_CONTAINER_BASIC(Char, char)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(Float, float)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(Double, double)
+
+DEFINE_RELATIONAL_CONTAINER_BASIC(LongDouble, long double)
+
+DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedShort, unsigned short)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedInt, unsigned int)
 

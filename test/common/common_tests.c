@@ -2,4 +2,4 @@
 
 #include "../macros.h"
 
-int common_tests() { return list_tests() || map_tests(); }
+int common_tests(void) { return vector_tests() || map_tests(); }

@@ -39,7 +39,7 @@ const KeyValuePair Map_find(const Map *map, const void *key);
 bool Map_get(const Map *map, const void *key, void *data_out);
 
 // Checks whether the given key exists in the map.
-bool Map_exists(const Map *map, const void *key);
+bool Map_contains_key(const Map *map, const void *key);
 
 // Removes an item from the map.
 void Map_delete(Map *map, const void *key);
@@ -89,7 +89,7 @@ void Map_get_value_iterator(const Map *map, Iterator *iter);
   typedef struct KeyValuePair kn##vn##KeyValuePair;                              \
   typedef struct kn##vn##Iterator kn##vn##Iterator;\
   extern KeyInfo kn##_key_info;                                               \
-  kn##vn##Map *kn##vn##Map_alloc();                                                \
+  kn##vn##Map *kn##vn##Map_alloc(void);                                                \
   const kn##vn##KeyValuePair kn##vn##Map_add(kn##vn##Map *map, const Key_T key,      \
                                          const Value_T data);                  \
   const kn##vn##KeyValuePair kn##vn##Map_add_ref(kn##vn##Map *map, const Key_T *key, \
@@ -101,8 +101,8 @@ void Map_get_value_iterator(const Map *map, Iterator *iter);
   Value_T kn##vn##Map_get(const kn##vn##Map *map, const Key_T key);                \
   bool kn##vn##Map_get_ref(const kn##vn##Map *map, const Key_T *key,               \
                          Value_T *data_out);                                   \
-  bool kn##vn##Map_exists(const kn##vn##Map *map, const Key_T key);                \
-  bool kn##vn##Map_exists_ref(const kn##vn##Map *map, const Key_T *key);           \
+  bool kn##vn##Map_contains_key(const kn##vn##Map *map, const Key_T key);                \
+  bool kn##vn##Map_contains_key_ref(const kn##vn##Map *map, const Key_T *key);           \
   void kn##vn##Map_delete(kn##vn##Map *map, const Key_T key);                      \
   void kn##vn##Map_delete_ref(kn##vn##Map *map, const Key_T *key);                 \
   bool kn##vn##Map_copy(kn##vn##Map *dest_map, const kn##vn##Map *map);              \

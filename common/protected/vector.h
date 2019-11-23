@@ -1,7 +1,7 @@
 #ifndef COMMON_PROTECTED_VECTOR_H__
 #define COMMON_PROTECTED_VECTOR_H__
 
-#include "../public/list.h"
+#include "../public/vector.h"
 
 #include <stdlib.h>
 

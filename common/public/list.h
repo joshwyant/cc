@@ -120,7 +120,7 @@ void List_get_reverse_sink(const List *list, Sink *sink);
 #define DECLARE_LIST(name, T)                                             \
   typedef struct List name##List;                                      \
   typedef struct ListNode name##ListNode;                                      \
-  name##List *name##List_alloc();                                      \
+  name##List *name##List_alloc(void);                                      \
   T name##List_get_first(const name##List *list);                     \
   T name##List_get_last(const name##List *list);                      \
   T *name##List_get_first_ref(const name##List *list);                     \
@@ -161,7 +161,7 @@ void List_get_reverse_sink(const List *list, Sink *sink);
                                        name##Sink *sink);
 
 #define DEFINE_LIST(name, T)                                              \
-  name##List *name##List_alloc() {                                     \
+  name##List *name##List_alloc(void) {                                     \
     return (name##List *)List_alloc(sizeof(List));                 \
   }                                                                            \
   T name##List_get_first(const name##List *list) {                     \

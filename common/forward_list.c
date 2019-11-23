@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "../test/stubs.h"
+#include "public/collections.h"
 #include "public/assert.h"
 
 // TODO: version

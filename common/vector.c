@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "../test/stubs.h"
+#include "public/collections.h"
 #include "public/assert.h"
 
 bool Vector_init(Vector *vector, size_t elem_size);
@@ -223,7 +224,7 @@ void *Vector_insert_range(Vector *vector, size_t index, const void *elems,
   void *insertion_dest = vector->data + vector->elem_size * index;
   // Shift the data to make room if not appending
   if (index != vector->elem_count) {
-    memcpy(insertion_dest + data_size, insertion_dest, shifted_size);
+    memmove(insertion_dest + data_size, insertion_dest, shifted_size);
   }
   if (elems !=
       insertion_dest) { // a trick to shift the data without initializing

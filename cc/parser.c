@@ -5,7 +5,7 @@
 DECLARE_CONTAINER(Token, Token);
 extern TokenIterator *token_input;
 
-void preprocessor() {
+void preprocessor(void) {
     LexGenerator *lexer = LexGenerator_alloc();
     while (!LexGenerator_eof(lexer)) {
         Token t = Lex(lexer);
@@ -17,7 +17,7 @@ void preprocessor() {
     // yield_eof;
 }
 
-void parser() {
+void parser(void) {
     while (!Token_eof(token_input)) {
         Token t = Token_next(token_input);
         // ...

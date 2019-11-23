@@ -11,8 +11,8 @@
   }
 
 #define TEST(name)                                                             \
-  void _test_##name();                                                         \
-  int test_##name() {                                                          \
+  void _test_##name(void);                                                         \
+  int test_##name(void) {                                                          \
     printf("=================================================================" \
            "===============\n");                                               \
     printf("== Test: %-68s ==\n", "test_" #name);                              \
@@ -22,7 +22,7 @@
     printf("\n%s completed.\n\n", "test_" #name);                              \
     return 0;                                                                  \
   }                                                                            \
-  void _test_##name()
+  void _test_##name(void)
 
 struct test {
   int foo;

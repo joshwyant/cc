@@ -14,8 +14,33 @@
                 "-g",
                 "${workspaceFolder}/test/common/*.c",
                 "-o",
-                "${workspaceFolder}/bin/test_common",
-                "-Wno-extern-initializer"
+                "${workspaceFolder}/bin/test_common"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "clang build cc",
+            "command": "/usr/bin/cc",
+            "args": [
+                "-D",
+                "TESTING",
+                "-g",
+                "${workspaceFolder}/common/*.c",
+                "-g",
+                "${workspaceFolder}/cc/*.c",
+                "-g",
+                "${workspaceFolder}/test/*.c",
+                "-g",
+                "${workspaceFolder}/test/common/*.c",
+                "-o",
+                "${workspaceFolder}/bin/cc"
             ],
             "options": {
                 "cwd": "/usr/bin"

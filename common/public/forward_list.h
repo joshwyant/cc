@@ -113,7 +113,7 @@ void ForwardList_get_reverse_sink(const ForwardList *list, Sink *sink);
 #define DECLARE_FORWARD_LIST(name, T)                                           \
   typedef struct ForwardList name##ForwardList;                                  \
   typedef struct ForwardListNode name##ForwardListNode;                          \
-  name##ForwardList *name##ForwardList_alloc();                                  \
+  name##ForwardList *name##ForwardList_alloc(void);                                  \
   T name##ForwardList_get_first(const name##ForwardList *list);                  \
   T name##ForwardList_get_last(const name##ForwardList *list);                   \
   T *name##ForwardList_get_first_ref(const name##ForwardList *list);             \
@@ -150,7 +150,7 @@ void ForwardList_get_reverse_sink(const ForwardList *list, Sink *sink);
                                          name##Sink *sink);
 
 #define DEFINE_FORWARD_LIST(name, T)                                            \
-  name##ForwardList *name##ForwardList_alloc() {                                 \
+  name##ForwardList *name##ForwardList_alloc(void) {                                 \
     return (name##ForwardList *)ForwardList_alloc(sizeof(ForwardList));           \
   }                                                                            \
   T name##ForwardList_get_first(const name##ForwardList *list) {                 \

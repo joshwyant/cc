@@ -2,4 +2,10 @@
 
 #include <stdio.h>
 
-int main(int argc, char **argv) { printf("Josh's C Compiler\n"); }
+#include "../test/stubs.h"
+
+int main(int argc, char **argv) { 
+    init_malloc_logging();
+    printf("Josh's C Compiler\n");
+    find_leaks();
+}

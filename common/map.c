@@ -276,7 +276,7 @@ bool Map_get(const Map *map, const void *key, void *data_out) {
 }
 
 // Checks whether the given key exists in the map.
-bool Map_exists(const Map *map, const void *key) {
+bool Map_contains_key(const Map *map, const void *key) {
   ASSERT(map != NULL);
   ASSERT(key != NULL);
 
@@ -391,7 +391,7 @@ bool Map_intersection(Map *dest_map, const Map *a, const Map *b) {
     size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (!Map_exists(b, kvp->key))
+      if (!Map_contains_key(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
@@ -413,7 +413,7 @@ bool Map_difference(Map *dest_map, const Map *a, const Map *b) {
     size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (Map_exists(b, kvp->key))
+      if (Map_contains_key(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
@@ -435,7 +435,7 @@ bool Map_symmetric_difference(Map *dest_map, const Map *a, const Map *b) {
     size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (Map_exists(b, kvp->key))
+      if (Map_contains_key(b, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
@@ -447,7 +447,7 @@ bool Map_symmetric_difference(Map *dest_map, const Map *a, const Map *b) {
     size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (Map_exists(a, kvp->key))
+      if (Map_contains_key(a, kvp->key))
         continue;
       if (!Map_add(dest_map, kvp->key, kvp->value).key) {
         return false;
@@ -489,7 +489,7 @@ bool Map_intersect_with(Map *dest_map, const Map *map) {
          Vector_count(bucket->key_value_pairs) /* inline due to modification */;
          j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (!Map_exists(map, kvp->key)) {
+      if (!Map_contains_key(map, kvp->key)) {
         free(kvp->key);
         free(kvp->value);
         Vector_remove(bucket->key_value_pairs,
@@ -513,7 +513,7 @@ bool Map_difference_with(Map *dest_map, const Map *map) {
          Vector_count(bucket->key_value_pairs) /* inline due to modification */;
          j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (Map_exists(map, kvp->key)) {
+      if (Map_contains_key(map, kvp->key)) {
         free(kvp->key);
         free(kvp->value);
         Vector_remove(bucket->key_value_pairs,
@@ -535,7 +535,7 @@ bool Map_symmetric_difference_with(Map *dest_map, const Map *map) {
     size_t nitems = Vector_count(bucket->key_value_pairs);
     for (size_t j = 0; j < nitems; j++) {
       kvp = Vector_get(bucket->key_value_pairs, j);
-      if (Map_exists(dest_map, kvp->key)) {
+      if (Map_contains_key(dest_map, kvp->key)) {
         Map_delete(dest_map, kvp->key);
       } else {
         if (!Map_add(dest_map, kvp->key, kvp->value).key) {

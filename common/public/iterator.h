@@ -216,7 +216,12 @@ int StringCase_hash(const void *key);
   }
 
 #define DEFINE_RELATIONAL_CONTAINER_BASIC(name, T)                             \
-  DEFINE_RELATIONAL_CONTAINER(name, T, key * 7, a - b)                         \
+  DEFINE_RELATIONAL_CONTAINER(                                                 \
+      name, T,                                                                 \
+      (int)(unsigned int)((unsigned long long)((long double)key *              \
+                                               2654435761) %                   \
+                          0x100000000ul),                                      \
+      a - b)                                                                   \
   DEFINE_CONTAINER_REDUCER(name, T, sum, 0, a + b)                             \
   DEFINE_CONTAINER_REDUCER(name, T, product, 1, a *b)                          \
   DEFINE_CONTAINER_REDUCER(name, T, min, (T)0x7FFFFFFFFFFFFFFF,                \

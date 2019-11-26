@@ -53,6 +53,7 @@ TEST(vector_basics) {
   // Also check to make sure container element sizes are the same.
   StringVector_get_iterator(svector, &siter);
   String_for_each(&siter, test_string_foreach);
+  Vector_free((Vector*)svector);
 
   IntVector *ivector = IntVector_alloc();
   IntIterator iiter;
@@ -62,10 +63,11 @@ TEST(vector_basics) {
 
   IntVector_get_iterator(ivector, &iiter);
   Int_for_each(&iiter, test_int_foreach);
+  Vector_free((Vector*)ivector);
 }
 
 int vector_tests(void) { return test_vector_basics(); }
 
-void test_string_foreach(char **item) { printf("%s\n", *item); }
+void test_string_foreach(char **item) { /*...*/ }
 
-void test_int_foreach(int *item) { printf("%d\n", *item); }
+void test_int_foreach(int *item) { /*...*/ }

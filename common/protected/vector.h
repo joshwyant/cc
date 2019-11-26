@@ -22,6 +22,8 @@ struct Vector {
 
   // Detect changes to the list while iterating
   int version;
+
+  void (*print)(const Vector *, char*, const void*);
 };
 
 #endif // #ifndef COMMON_PROTECTED_VECTOR_H__

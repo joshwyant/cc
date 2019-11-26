@@ -55,7 +55,7 @@ bool Set_init_ext(Set *set, KeyInfo *key_info, size_t capacity) {
   }
   return true;
 error_buckets:
-  free(set->buckets);
+  Vector_free(set->buckets);
   set->buckets = NULL;
 error:
   return false;
@@ -185,11 +185,11 @@ void *Set_add(Set *set, const void *key) {
     size_t ibucket = hash % Vector_count(set->buckets);
     struct SetBucket *bucket = Vector_get(set->buckets, ibucket);
     if (!(val = malloc(set->key_info.key_size))) {
-      goto out;
+      goto error;
     }
     if (!Vector_add(bucket->items, &val)) {
       val = NULL;
-      goto out_buckets;
+      goto error_buckets;
     }
     set->count++;
   }
@@ -204,10 +204,11 @@ void *Set_add(Set *set, const void *key) {
               (unsigned long long)(set->capacity << 1));
     }
   }
-out_buckets:
-  free(val);
-out:
   return val;
+error_buckets:
+  free(val);
+error:
+  return NULL;
 }
 
 const void *_Set_find_ext(const Set *set, const void *key, int hash) {

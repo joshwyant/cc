@@ -14,9 +14,12 @@ struct Map {
   size_t capacity;
   size_t count;
   int version;
+  void (*print_key)(const Map *, char*, const void*);
+  void (*print_value)(const Map *, char*, const void*);
 };
 
 struct MapBucket {
+  Map *map;
   Vector *key_value_pairs;
 };
 

@@ -84,6 +84,14 @@ void Map_get_key_iterator(const Map *map, Iterator *iter);
 // Gets a value Iterator for this Map in an undefined order.
 void Map_get_value_iterator(const Map *map, Iterator *iter);
 
+void Map_print_key_fn(Map *map, void (*print)(const Map *self, char *target_str, const void *elem));
+
+void Map_print_value_fn(Map *map, void (*print)(const Map *self, char *target_str, const void *elem));
+
+void Map_print_element(const Map *map, char *buffer, const char *key);
+
+void Map_print(const Map *map, char *buffer);
+
 #define DECLARE_MAP(kn, Key_T, vn, Value_T)                                      \
   typedef struct Map kn##vn##Map;                                                \
   typedef struct KeyValuePair kn##vn##KeyValuePair;                              \

@@ -102,6 +102,10 @@ void Vector_get_sink(const Vector *vector, Sink *sink);
 // Gets an Indexer for this vector
 void Vector_get_indexer(const Vector *vector, Indexer *indexer);
 
+void Vector_print_fn(Vector *vector, void (*print)(const Vector *self, char *target_str, const void *elem));
+
+void Vector_print(Vector *vector, char *buffer, size_t index);
+
 #define DECLARE_VECTOR(name, T)                                                  \
   /* A dynamically growing vector. */                                            \
   typedef struct name##Vector name##Vector;                                        \

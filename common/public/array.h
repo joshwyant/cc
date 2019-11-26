@@ -11,9 +11,6 @@ typedef struct Array Array;
 
 Array *Array_alloc(size_t count, size_t elem_size);
 
-// Allocates the array on the stack
-Array *Array_alloca(size_t count, size_t elem_size);
-
 // Re-zeroes out the memory of the used array.
 void Array_clear(Array *array);
 
@@ -65,7 +62,6 @@ void Array_get_indexer(const Array *array, Indexer *indexer);
 #define DECLARE_ARRAY(name, T)                                                 \
   typedef struct Array name##Array;                                            \
   name##Array *name##Array_alloc(size_t count);                                \
-  name##Array *name##Array_alloca(size_t count);                               \
   T *name##Array_get_data(name##Array *array);                                 \
   T name##Array_get(name##Array *array, size_t index);                         \
   T *name##Array_get_ref(name##Array *array, size_t index);                    \
@@ -86,9 +82,6 @@ void Array_get_indexer(const Array *array, Indexer *indexer);
 #define DEFINE_ARRAY(name, T)                                                  \
   name##Array *name##Array_alloc(size_t count) {                               \
     return (name##Array *)Array_alloc(count, sizeof(T));                       \
-  }                                                                            \
-  name##Array *name##Array_alloca(size_t count) {                              \
-    return (name##Array *)Array_alloca(count, sizeof(T));                      \
   }                                                                            \
   T *name##Array_get_data(name##Array *array) {                                \
     return (T *)Array_get_data((Array *)array);                                \

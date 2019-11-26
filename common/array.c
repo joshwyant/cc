@@ -32,19 +32,7 @@ Array *Array_alloc(size_t count, size_t elem_size)
     ASSERT(count > 0);
     ASSERT(elem_size > 0);
     Array *array;
-    if (NULL == (array = malloc(sizeof(Array) + count * elem_size))) {
-        return NULL;
-    }
-    Array_init(array, count, elem_size);
-    return array;
-}
-
-Array *Array_alloca(size_t count, size_t elem_size)
-{
-    ASSERT(count > 0);
-    ASSERT(elem_size > 0);
-    Array *array;
-    if (NULL == (array = alloca(sizeof(Array) + count * elem_size))) {
+    if (NULL == (array = calloc(sizeof(Array) + count * elem_size, 1))) {
         return NULL;
     }
     Array_init(array, count, elem_size);

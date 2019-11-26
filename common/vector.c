@@ -161,6 +161,8 @@ bool Vector_reserve(Vector *vector, size_t num_elems)
 bool Vector_expand(Vector *vector, size_t num_elems)
 {
   if (!Vector_reserve(vector, num_elems)) return false;
+  memset(vector->data + vector->elem_count * vector->elem_size, 0,
+         (num_elems - vector->elem_count) * vector->elem_size);
   vector->elem_count = num_elems;
   return true;
 }
@@ -390,6 +392,7 @@ void Vector_remove_range(Vector *vector, size_t start_index, size_t count)
     } while (vector->reserve_count >> 1 > vector->elem_count - count);
     LOG_FORMAT(TRACE, "Reducing the capacity of the vector from %zu to %zu...",
                old_capacity, vector->reserve_count);
+    // Use malloc for less copying.
     new_data = malloc(vector->reserve_count * vector->elem_size);
     if (new_data == NULL) {
       new_data = vector->data;

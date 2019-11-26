@@ -8,7 +8,7 @@
                 "-D",
                 "TESTING",
                 "-D",
-                "LOGLEVEL=TRACE",
+                "LOGLEVEL=DEBUG",
                 "-g",
                 "${workspaceFolder}/common/*.c",
                 "-g",

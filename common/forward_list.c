@@ -18,7 +18,7 @@ DEFINE_FORWARD_LIST(Double, double)
 DEFINE_FORWARD_LIST(UnsignedInt, unsigned int)
 DEFINE_FORWARD_LIST(UnsignedLong, unsigned long)
 DEFINE_FORWARD_LIST(UnsignedChar, unsigned char)
-DEFINE_FORWARD_LIST(String, char *)
+DEFINE_FORWARD_LIST(CString, char *)
 
 bool ForwardList_init(ForwardList *list, size_t elem_size)
 {

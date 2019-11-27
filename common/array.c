@@ -14,7 +14,7 @@ DEFINE_ARRAY(Double, double)
 DEFINE_ARRAY(UnsignedInt, unsigned int)
 DEFINE_ARRAY(UnsignedLong, unsigned long)
 DEFINE_ARRAY(UnsignedChar, unsigned char)
-DEFINE_ARRAY(String, char *)
+DEFINE_ARRAY(CString, char *)
 
 bool Array_init(Array *array, size_t count, size_t elem_size)
 {

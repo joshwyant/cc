@@ -172,15 +172,15 @@ void Iterator_filter(const Sink *dest, Iterator *iter,
 void Iterator_reduce(const void *dest, Iterator *iter,
                      void (*reduce_fn)(void *dest, const void *elem)) {}
 
-int String_compare(const void *a, const void *b) {
+int CString_compare(const void *a, const void *b) {
   return strcmp((char *)a, (char *)b);
 }
 
-int StringCase_compare(const void *a, const void *b) {
+int CStringCase_compare(const void *a, const void *b) {
   return strcasecmp((char *)a, (char *)b);
 }
 
-int String_hash(const void *key) {
+int CString_hash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * *c;
@@ -188,7 +188,7 @@ int String_hash(const void *key) {
   return hash;
 }
 
-int StringCase_hash(const void *key) {
+int CStringCase_hash(const void *key) {
   int hash = 13;
   for (char *c = (char *)key; *c; c++) {
     hash = hash * 7 + 17 * toupper(*c);
@@ -218,7 +218,7 @@ DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedLong, unsigned long)
 
 DEFINE_RELATIONAL_CONTAINER_BASIC(UnsignedChar, unsigned char)
 
-DEFINE_RELATIONAL_CONTAINER_FN(String, char *, String_hash, String_compare)
+DEFINE_RELATIONAL_CONTAINER_FN(CString, char *, CString_hash, CString_compare)
 
-DEFINE_RELATIONAL_CONTAINER_FN(StringCase, char *, StringCase_hash,
-                               String_compare)
+DEFINE_RELATIONAL_CONTAINER_FN(CStringCase, char *, CStringCase_hash,
+                               CString_compare)

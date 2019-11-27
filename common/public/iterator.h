@@ -112,13 +112,13 @@ void Iterator_reduce(const void *dest, Iterator *iter,
 void Iterator_filter(const Sink *dest, Iterator *iter,
                      bool (*filter_fn)(const void *elem));
 
-int String_compare(const void *a, const void *b);
+int CString_compare(const void *a, const void *b);
 
-int StringCase_compare(const void *a, const void *b);
+int CStringCase_compare(const void *a, const void *b);
 
-int String_hash(const void *key);
+int CString_hash(const void *key);
 
-int StringCase_hash(const void *key);
+int CStringCase_hash(const void *key);
 
 #define DECLARE_CONTAINER_FN(name, T, hash_fn, eq_fn)                          \
   DECLARE_ITERATOR_TYPE(name, T)                                               \
@@ -252,9 +252,9 @@ DECLARE_RELATIONAL_CONTAINER(UnsignedShort, unsigned short);
 
 DECLARE_RELATIONAL_CONTAINER(UnsignedChar, unsigned char);
 
-DECLARE_RELATIONAL_CONTAINER(String, char *);
+DECLARE_RELATIONAL_CONTAINER(CString, char *);
 
 // Needed for case-insensitive maps.
-DECLARE_RELATIONAL_CONTAINER(StringCase, char *);
+DECLARE_RELATIONAL_CONTAINER(CStringCase, char *);
 
 #endif // COMMON_PUBLIC_ITERATOR_H__

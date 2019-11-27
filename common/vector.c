@@ -19,7 +19,7 @@ DEFINE_VECTOR(Double, double);
 DEFINE_VECTOR(UnsignedInt, unsigned int);
 DEFINE_VECTOR(UnsignedLong, unsigned long);
 DEFINE_VECTOR(UnsignedChar, unsigned char);
-DEFINE_VECTOR(String, char *);
+DEFINE_VECTOR(CString, char *);
 
 void _Vector_log(Vector *vector)
 {

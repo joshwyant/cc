@@ -18,7 +18,7 @@ DEFINE_LIST(Double, double)
 DEFINE_LIST(UnsignedInt, unsigned int)
 DEFINE_LIST(UnsignedLong, unsigned long)
 DEFINE_LIST(UnsignedChar, unsigned char)
-DEFINE_LIST(String, char *)
+DEFINE_LIST(CString, char *)
 
 bool List_init(List *list, size_t elem_size)
 {

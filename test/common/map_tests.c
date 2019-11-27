@@ -5,7 +5,7 @@ TEST(map_basics) {
   Map *m;
   int one = 1, two = 2, three = 3;
   char *a = "a", *b = "b", *c = "c";
-  m = Map_alloc(&StringKeyInfo, sizeof(int));
+  m = Map_alloc(&CStringKeyInfo, sizeof(int));
 
   Map_add(m, &a, &one);
   Map_add(m, &b, &two);

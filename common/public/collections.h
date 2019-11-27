@@ -19,7 +19,7 @@
 #define DOMAP(k, v) EVAL_TUPLE(DECLARE_MAP, (SEQ_FROM_TUPLE(k), SEQ_FROM_TUPLE(v)))
 
 #define DO_COLLECTIONS(...) \
-    CARTESIAN(DOMAP, (__VA_ARGS__, (StringCase, char *)), (__VA_ARGS__)) \
+    CARTESIAN(DOMAP, (__VA_ARGS__, (CStringCase, char *)), (__VA_ARGS__)) \
     CARTESIAN(DOCOLLECTION, (DECLARE_VECTOR, DECLARE_LIST, DECLARE_ARRAY, DECLARE_FORWARD_LIST), (__VA_ARGS__))
 
 DO_COLLECTIONS(
@@ -35,6 +35,6 @@ DO_COLLECTIONS(
     (UnsignedShort, unsigned short), 
     (UnsignedInt, unsigned int),
     (UnsignedLong, unsigned long), 
-    (String, char*))
+    (CString, char*))
 
 #endif // COMMON_PUBLIC_COLLECTION_H__

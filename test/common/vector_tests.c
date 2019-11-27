@@ -55,16 +55,16 @@ TEST(vector_basics) {
 
   Vector_free(vector);
 
-  StringVector *svector = StringVector_alloc();
-  StringIterator siter;
-  StringVector_add(svector, "ABC");
-  StringVector_add(svector, "DEF");
-  StringVector_add(svector, "GHI");
+  CStringVector *svector = CStringVector_alloc();
+  CStringIterator siter;
+  CStringVector_add(svector, "ABC");
+  CStringVector_add(svector, "DEF");
+  CStringVector_add(svector, "GHI");
 
   // TODO: wrongly accepts any kind of vector
   // Also check to make sure container element sizes are the same.
-  StringVector_get_iterator(svector, &siter);
-  String_for_each(&siter, test_string_foreach);
+  CStringVector_get_iterator(svector, &siter);
+  CString_for_each(&siter, test_string_foreach);
   Vector_free((Vector*)svector);
 
   IntVector *ivector = IntVector_alloc();

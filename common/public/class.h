@@ -5,38 +5,31 @@
 
 typedef struct Class Class;
 
+#define DECLARE_VALUE_TYPE(name, T)                                            \
+  typedef struct name name;                                                    \
+  extern Class *name##Class;                                                   \
+  name *name##_create(T value);                                                \
+  T name##_unbox(name *obj);
+
+DECLARE_VALUE_TYPE(Char, char)
+DECLARE_VALUE_TYPE(Short, short)
+DECLARE_VALUE_TYPE(Int, int)
+DECLARE_VALUE_TYPE(Long, long)
+DECLARE_VALUE_TYPE(Pointer, void *)
+DECLARE_VALUE_TYPE(Float, float)
+DECLARE_VALUE_TYPE(Double, double)
+DECLARE_VALUE_TYPE(LongDouble, long double)
+DECLARE_VALUE_TYPE(UnsignedChar, unsigned char)
+DECLARE_VALUE_TYPE(UnsignedShort, unsigned short)
+DECLARE_VALUE_TYPE(UnsignedInt, unsigned int)
+DECLARE_VALUE_TYPE(UnsignedLong, unsigned long)
+DECLARE_VALUE_TYPE(CString, char *)
+
 typedef struct Object Object;
 typedef struct Value Value;
-typedef struct Comparable Comparable;
-typedef struct Char Char;
-typedef struct Short Short;
-typedef struct Int Int;
-typedef struct Long Long;
-typedef struct Pointer Pointer;
-typedef struct Float Float;
-typedef struct Double Double;
-typedef struct LongDouble LongDouble;
-typedef struct UnsignedChar UnsignedChar;
-typedef struct UnsignedShort UnsignedShort;
-typedef struct UnsignedInt UnsignedInt;
-typedef struct UnsignedLong UnsignedLong;
-typedef struct CString CString;
 
 extern Class *ObjectClass;
 extern Class *ValueClass;
-extern Class *CharClass;
-extern Class *ShortClass;
-extern Class *IntClass;
-extern Class *LongClass;
-extern Class *PointerClass;
-extern Class *FloatClass;
-extern Class *DoubleClass;
-extern Class *LongDoubleClass;
-extern Class *UnsignedCharClass;
-extern Class *UnsignedShortClass;
-extern Class *UnsignedIntClass;
-extern Class *UnsignedLongClass;
-extern Class *CStringClass;
 
 const char *Class_name(Class *c);
 const size_t Class_sizeof(Class *c);
@@ -52,32 +45,5 @@ void *Create(Class *c, ...);
 void *CreateProtected(Class *c, ...);
 void *Destroy(void *o);
 void *Clone(void *o);
-
-Char *Char_create(char value);
-Short *Short_create(short value);
-Int *Int_create(int value);
-Long *Long_create(long value);
-Pointer *Pointer_create(void *value);
-Float *Float_create(float value);
-Double *Double_create(double value);
-LongDouble *LongDouble_create(long double value);
-UnsignedChar *UnsignedChar_create(unsigned char value);
-UnsignedShort *UnsignedShort_create(unsigned short value);
-UnsignedInt *UnsignedInt_create(unsigned int value);
-UnsignedLong *UnsignedLong_create(unsigned long value);
-CString *CString_create(char *value);
-char Char_unbox(Char *obj);
-short Short_unbox(Short *obj);
-int Int_unbox(Int *obj);
-long Long_unbox(Long *obj);
-void *Pointer_unbox(Pointer *obj);
-float Float_unbox(Float *obj);
-double Double_unbox(Double *obj);
-long double LongDouble_unbox(Long *obj);
-unsigned char UnsignedChar_unbox(UnsignedChar *obj);
-unsigned short UnsignedShort_unbox(UnsignedShort *obj);
-unsigned int UnsignedInt_unbox(UnsignedInt *obj);
-unsigned long UnsignedLong_unbox(UnsignedLong *obj);
-char *CString_unbox(CString *obj);
 
 #endif

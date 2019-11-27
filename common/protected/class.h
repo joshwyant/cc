@@ -86,4 +86,6 @@ DECLARE_VALUE_TYPE(UnsignedInt, unsigned int)
 DECLARE_VALUE_TYPE(UnsignedLong, unsigned long)
 DECLARE_VALUE_TYPE(CString, char *)
 
+#undef DECLARE_VALUE_TYPE
+
 #endif // COMMON_PROTECTED_CLASS_H__

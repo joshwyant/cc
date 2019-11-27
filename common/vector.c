@@ -126,7 +126,7 @@ bool _Vector_reserve_ext(Vector *vector, size_t num_elems, bool slim) {
   LOG_INDENT();
   _Vector_log(vector);
 
-  if (vector->reserve_count >= num_elems) {
+  if (vector->reserve_count >= num_elems && Vector_capacity(vector) >= num_elems) {
     LOG_FORMAT(TRACE, "Already enough capacity (%zu >= %zu requested elements).", vector->reserve_count, num_elems);
     LOG_DEINDENT();
     return true; // No-op case
@@ -146,7 +146,7 @@ bool _Vector_reserve_ext(Vector *vector, size_t num_elems, bool slim) {
   }
   vector->data = data;
   vector->reserve_count = reserve_count;
-  vector->data_size = (slim ? num_elems : reserve_count) * vector->elem_size;
+  vector->data_size = new_data_size;
   LOG(TRACE, "Vector resized. Updated vector:");
   _Vector_log(vector);
   LOG_DEINDENT();
@@ -160,6 +160,8 @@ bool Vector_reserve(Vector *vector, size_t num_elems)
 
 bool Vector_expand(Vector *vector, size_t num_elems)
 {
+  ASSERT(vector);
+  ASSERT(num_elems > vector->elem_count);
   if (!Vector_reserve(vector, num_elems)) return false;
   memset(vector->data + vector->elem_count * vector->elem_size, 0,
          (num_elems - vector->elem_count) * vector->elem_size);

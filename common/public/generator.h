@@ -1,5 +1,5 @@
-#ifndef COMMON_PUBLIC_COROUTINE_H__
-#define COMMON_PUBLIC_COROUTINE_H__
+#ifndef COMMON_PUBLIC_GENERATOR_H__
+#define COMMON_PUBLIC_GENERATOR_H__
 
 #include "for_each_macros.h"
 #include "iterator.h"
@@ -20,6 +20,7 @@
 #define DECLARE_GENERATOR(T, name) \
 typedef struct name##Generator name##Generator;\
 name##Generator *name##Generator_alloc(void);\
+void name##Generator_free(name##Generator *gen);\
 bool name##Generator_eof(name##Generator *iter);\
 T name(name##Generator *iter);
 
@@ -34,6 +35,9 @@ struct name##Generator {\
 typedef struct name##Generator name##Generator;\
 name##Generator *name##Generator_alloc(void) {\
   return calloc(1, sizeof(name##Generator));\
+}\
+void name##Generator_free(name##Generator *gen) {\
+  free(gen);\
 }\
 bool name##Generator_eof(name##Generator *iter) {\
   return iter->eof;\
@@ -54,4 +58,4 @@ branch_label:\
 
 #define yield_eof }} iter->eof = true; return eof;
 
-#endif // COMMON_PUBLIC_COROUTINE_H__
+#endif // COMMON_PUBLIC_GENERATOR_H__

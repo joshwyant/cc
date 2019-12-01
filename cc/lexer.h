@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/public/coroutine.h"
+#include "../common/public/generator.h"
 #include "../common/public/list.h"
 
 enum TokenKind {
